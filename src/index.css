@@ -1,0 +1,34 @@
+.card_taller{
+    box-shadow: 1px 1px 4px #6a6b6b;
+}
+.card_taller:hover{
+  top: 2px;
+  box-shadow: 4px 4px 7px #6a6b6b;
+}
+.image{
+   opacity: 1 
+}
+.image:hover{
+   opacity: 1
+}
+
+.containerFluid{
+   position: relative;
+   background: #EDEDEF;
+   align-content: center;
+   left: 7%;
+   width: 90%;
+   /*display: flex;*/
+}
+.containerList{
+   position: relative;
+   align-content: center;
+   left: 7%;
+   width: 80%;
+   /*display: flex;*/
+}
+.reactPlayer{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
