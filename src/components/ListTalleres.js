@@ -5,8 +5,14 @@ import axios from 'axios';
 import{Link, useParams} from'react-router-dom';
 import {render}from'react-dom';
 
+import Navigation from '../components/Navigation';
+import Breadcrumb_nav from '../components/Breadcrumb_nav';
+
+import Cookies from 'universal-cookie';
 
 
+
+const cookies = new Cookies();
 const{REACT_APP_HOST} = process.env;
 
 const styles = {
@@ -27,6 +33,9 @@ export default class ListTalleres extends Component {
     }
 
     componentDidMount() {
+        if (!cookies.get('nombre')) {
+            window.location.href = '/'
+        }
         this.getTaller();
     }
     getTaller() {
@@ -44,36 +53,39 @@ export default class ListTalleres extends Component {
     render() {
 
         return (
-                <Container>
-
-                    {this.state.talleres.length>0 ?
+                <div>
+                    <Navigation />
+                    <Container>
+                
+                        {this.state.talleres.length > 0 ?
                                     <div className="row my-5">
-                                
+                            
                                         {
-                                                this.state.talleres.map((taller) => (
+                                                    this.state.talleres.map((taller) => (
                                                                 <div className="col-md-3" key={taller._id} style={styles.div}>
                                                                     <Link to={`/presentacion/${taller._id}`} style={{color: "black", textDecoration: "none black"}}>
                                                                     <Card className="card_taller">
                                                                     <CardHeader>
                                                                         <CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle>
                                                                     </CardHeader>
-                                                        
+                                                    
                                                                     <CardBody className="text-center">
                                                                         <CardImg className="image" top width="100%" src={`${REACT_APP_HOST}/public_image/${taller.image}`} alt="Card image cap" /> 
                                                                         <CardText>{taller.description}</CardText>
-                                                        
+                                                    
                                                                     </CardBody>
                                                                     </Card>
                                                                     </Link>
                                                                 </div>
-                                                            ))
+                                                                ))
                                         }
-                                
-                                
-                                
+                            
+                            
+                            
                                     </div>
-                                : <h5>No hay talleres registrados en esta area</h5>}
-                </Container>
+                                    : <h5>No hay talleres registrados en esta area</h5>}
+                    </Container>
+                </div>
                 )
     }
 }

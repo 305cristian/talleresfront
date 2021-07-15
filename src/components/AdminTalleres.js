@@ -4,13 +4,19 @@ import {Table, Button, Container, CustomInput, Modal, ModalHeader, ModalBody, Mo
 import Swal from 'sweetalert';
 import axios from 'axios'
 import P from '../components/P';
-import { FontAwesomeIcon }
-from '@fortawesome/react-fontawesome'
-import { faFileAlt, faEdit, faTrash, faFile }
-from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
+import { faFileAlt, faEdit, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo }from '@fortawesome/free-solid-svg-icons'
 //import { faApple} from '@fortawesome/free-brands-svg-icons'
 
-        const {REACT_APP_HOST} = process.env;
+import Navigation from '../components/Navigation';
+import Breadcrumb_nav from '../components/Breadcrumb_nav';
+
+import Cookies from 'universal-cookie';
+
+
+
+const cookies = new Cookies();
+const {REACT_APP_HOST} = process.env;
 
 const validation = data => {
     const errors = {};
@@ -46,22 +52,46 @@ class AdminTalleres extends Component {
             videoload: false,
             image: null,
             video: '...',
+            tiempo: '30',
+            intentos: '1',
             errors: {},
 
             //modal eval
+            //pregunta
             taller_id: '',
             pregunta: '',
+            estadopreg: true,
+            preguntas_taller: [],
+            pregunta_id: '',
+            puntaje: '',
+            btnCreaPreg: 'Crear',
+            _idpreg: '',
+
+            //respuesta
+            pregunta_resp: '',
+            pregunta_taller_id: '',
             respuesta: '',
-            estadoresp: false
+            estadoresp: false,
+            btnCreaResp: 'Crear',
+            respuestas_preg: [],
+            _idresp: ''
+
 
         };
 //        this.fileInput = React.createRef();
 
         this.addTaller = this.addTaller.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeSelect = this.handleChangeSelect.bind(this);
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
+
         this.addPregunta = this.addPregunta.bind(this);
+        this.editPregunta = this.editPregunta.bind(this);
+        this.deletePregunta = this.deletePregunta.bind(this);
+
+
+        this.addRespuesta = this.addRespuesta.bind(this);
     }
 
     componentDidMount() {
@@ -95,6 +125,8 @@ class AdminTalleres extends Component {
             datos.append('area_id', this.state.area_id);
             datos.append('title', this.state.title);
             datos.append('description', this.state.description);
+            datos.append('tiempo', this.state.tiempo);
+            datos.append('intentos', this.state.intentos);
             datos.append('image', this.state.image);
             datos.append('video', this.state.video);
             if (this.state._id) {
@@ -109,7 +141,7 @@ class AdminTalleres extends Component {
                         button: false
                     });
                     this.getTalleres();
-                    this.setState({title: '', description: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: null, errors: {}});
+                    this.setState({title: '', description: '', tiempo: '30', intentos: '1', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: null, errors: {}});
                 }).catch(err => console.error(err));
             } else {
                 axios.post(`${REACT_APP_HOST}/api/talleres`, datos).then((data) => {
@@ -123,7 +155,7 @@ class AdminTalleres extends Component {
                         button: false
                     });
                     this.getTalleres()
-                    this.setState({title: '', description: '', image: null});
+                    this.setState({title: '', description: '', tiempo: '30', intentos: '1', image: null});
                 })
                         .catch(err => console.error(err));
             }
@@ -159,6 +191,8 @@ class AdminTalleres extends Component {
             this.setState({
                 title: response.data.title,
                 description: response.data.description,
+                tiempo: response.data.tiempo,
+                intentos: response.data.intentos,
                 area_id: response.data.area_id,
                 image: response.data.image,
                 video: response.data.video,
@@ -172,17 +206,19 @@ class AdminTalleres extends Component {
         })
     }
     hideModal() {
-        this.setState({title: '', description: '', _id: '', textButton: 'REGISTRAR', header: 'Insertar Tarea', modalOpen: false, image: null, errors: {}, videoload: false});
+        this.setState({title: '', description: '', tiempo: '', intentos: '', _id: '', textButton: 'REGISTRAR', header: 'Insertar Tarea', modalOpen: false, image: null, errors: {}, videoload: false});
     }
     showModal() {
         this.setState({modalOpen: true});
     }
     showModalEval(idtaller) {
-        this.setState({modalEval: true, taller_id: idtaller});
+        this.setState({modalEval: true, taller_id: idtaller, pregunta_taller_id: idtaller});
+        this.getPreguntasXtaller(idtaller);
 
     }
+
     hideModalEval() {
-        this.setState({modalEval: false});
+        this.setState({modalEval: false, idtaller: '', pregunta: '', estadopreg: true, _idpreg: '', pregunta_resp: '', respuesta: '', estadoresp: false, _idresp: ''});
     }
 
     handleChange(e) {
@@ -195,6 +231,11 @@ class AdminTalleres extends Component {
         }
 //       
         this.setState({[name]: value});
+    }
+    handleChangeSelect(e) {
+        console.log(`Seleccionaste ${e.target.value}`);
+        var {name, value} = e.target;
+        this.setState({[name]: value}, () => this.getRespuestas());
     }
 
     handleImageUpload = (e) => {
@@ -236,14 +277,14 @@ class AdminTalleres extends Component {
         //text
         var inputtextResp = document.createElement('input');
         inputtextResp.setAttribute('type', 'text');
-        inputtextResp.setAttribute('name', 'respuesta');
+        inputtextResp.setAttribute('name', 'respuesta' + cont + '');
         inputtextResp.setAttribute('class', 'form-control form-control-sm mt-2');
         inputtextResp.setAttribute('value', 'Respuesta ' + cont + '');
 
         //checkBox
         var inputcheckResp = document.createElement('input');
         inputcheckResp.setAttribute('type', 'checkbox');
-        inputcheckResp.setAttribute('name', 'check');
+        inputcheckResp.setAttribute('name', 'estadopreg' + cont + '');
         inputcheckResp.setAttribute('class', 'form-control form-control-sm mt-2');
 
         //Quitar Respuesta
@@ -271,193 +312,446 @@ class AdminTalleres extends Component {
 
     addPregunta(e) {
         e.preventDefault();
-        let datos = new FormData();
-        datos.append('taller_id', this.state.taller_id);
-        datos.append('pregunta', this.state.pregunta);
-        datos.append('respuesta', this.state.respuesta);
-        datos.append('estadoresp', this.state.estadoresp) ;
-        
-        axios.post(`${REACT_APP_HOST}/api/preguntas`,datos).then((response) => {
-            console.log(response.data);           
-            Swal({
-                title: 'Pregunta registrada exitosamente',
-                text: 'ok',
-                icon: 'success',
-                timer: 2000,
-                button: false
-            });
-            this.setState({idtaller: '', pregunta: '', respuesta: '', estadoresp: ''})
-        }).catch(err => console.error(err));
+        /**
+         * Uso este metodo de enviar datos, solo en caso de enviar archivos (file,video, img)
+         * let datos = new FormData();
+         //        datos.append('taller_id', this.state.taller_id);
+         //        datos.append('pregunta', this.state.pregunta);
+         //        datos.append('respuesta', this.state.respuesta);
+         //        datos.append('estadopreg', this.state.estadopreg) ;
+         * @type type
+         */
+//        
+        const datos = {
+            taller_id: this.state.taller_id,
+            pregunta: this.state.pregunta,
+            puntaje: this.state.puntaje,
+            estadopreg: this.state.estadopreg
+
+        };
+        if (this.state._idpreg) {
+            axios.put(`${REACT_APP_HOST}/api/preguntas/` + this.state._idpreg, datos).then((response) => {
+                console.log(response.data);
+                Swal({
+                    title: 'Pregunta modificada exitosamente',
+                    text: 'ok',
+                    icon: 'success',
+                    timer: 2000,
+                    button: false
+                });
+                this.getPreguntasXtaller(this.state.taller_id);
+            }).catch(err => console.error(err));
+        } else {
+            axios.post(`${REACT_APP_HOST}/api/preguntas`, datos).then((response) => {
+                console.log(response.data);
+                Swal({
+                    title: 'Pregunta registrada exitosamente',
+                    text: 'ok',
+                    icon: 'success',
+                    timer: 2000,
+                    button: false
+                });
+                this.getPreguntasXtaller(this.state.taller_id);
+            }).catch(err => console.error(err));
+        }
+
+        this.setState({idtaller: '', pregunta: '', puntaje: '', estadopreg: true, _idpreg: '', btnCreaPreg: 'Crear'});
 
 
     }
+    getPreguntasXtaller(id) {
+        axios.get(`${REACT_APP_HOST}/api/preguntas/` + id).then((response) => {
+            this.setState({preguntas_taller: response.data});
+        });
+    }
+    editPregunta(id_preg) {
+        axios.get(`${REACT_APP_HOST}/api/preguntas/` + this.state.taller_id + '/' + id_preg).then((response) => {
+            this.setState({pregunta: response.data.pregunta, puntaje: response.data.puntaje, _idpreg: response.data._id, estadopreg: response.data.estadopreg, btnCreaPreg: 'Actualizar'});
+        })
 
+    }
+    deletePregunta(id_preg) {
+        Swal({
+            title: 'Esta seguro de eliminar la pregunta',
+            text: ' La pregunta se eliminara definitivamente',
+            icon: 'warning',
+            buttons: ['Cancelar', 'Sí'],
+            dangerMode: true
+        }
+        ).then((value) => {
+            if (value) {
+                axios.delete(`${REACT_APP_HOST}/api/preguntas/` + id_preg).then((response) => {
+                    if (response.data) {
+                        Swal({
+                            title: 'Pregunta eliminada exitosamente',
+                            text: 'ok',
+                            icon: 'success',
+                            timer: 2000,
+                            button: false
+                        })
+                        this.setState({idtaller: '', pregunta: '', estadopreg: true, _idpreg: ''});
+                        this.getPreguntasXtaller(this.state.taller_id);
+                    }
+
+                })
+
+            }
+        })
+//        alert(id_preg);
+
+    }
+
+    addRespuesta(e) {
+        e.preventDefault();
+        const datos = {
+            pregunta_resp: this.state.pregunta_resp,
+            respuesta: this.state.respuesta,
+            estadoresp: this.state.estadoresp,
+            resp_taller_id: this.state.pregunta_taller_id
+        };
+        if (this.state._idresp) {
+            axios.put(`${REACT_APP_HOST}/api/respuestas/` + this.state._idresp, datos).then((response) => {
+                console.log(response.data);
+                Swal({
+                    title: 'Respuesta Actualizada exitosamente',
+                    text: 'ok',
+                    icon: 'success',
+                    timer: 2000,
+                    button: false
+                });
+                this.getRespuestas();
+                this.setState({respuesta: '', estadoresp: false, _idresp: '', btnCreaResp: 'Crear'});
+            }).catch(err => console.error(err));
+        } else {
+            axios.post(`${REACT_APP_HOST}/api/respuestas`, datos).then((response) => {
+                console.log(response.data);
+                Swal({
+                    title: 'Respuesta registrada exitosamente',
+                    text: 'ok',
+                    icon: 'success',
+                    timer: 2000,
+                    button: false
+                });
+                this.getRespuestas();
+                this.setState({respuesta: '', estadoresp: false, btnCreaResp: 'Crear'});
+            }).catch(err => console.error(err));
+        }
+
+
+
+    }
+    getRespuestas() {
+        axios.get(`${REACT_APP_HOST}/api/respuestas/` + this.state.pregunta_resp + '/' + this.state.taller_id).then((response) => {
+            if (response) {
+                this.setState({respuestas_preg: response.data});
+            } else {
+                Swal({
+                    title: 'No se encontraron respuestas',
+                    icon: 'warning',
+                    timer: 2000,
+                    button: false
+                });
+            }
+        });
+    }
+
+    editRespuesta(id_resp) {
+        axios.get(`${REACT_APP_HOST}/api/respuestas/` + id_resp).then((response) => {
+            this.setState({btnCreaResp: 'Actualizar', respuesta: response.data.respuesta, estadoresp: response.data.estadoresp, puntaje: response.data.puntaje, pregunta_resp: response.data.pregunta_resp, _idresp: response.data._id});
+        })
+    }
+    deleteRespuesta(id_resp) {
+
+        Swal({
+            title: 'Esta seguro de eliminar la respuesta',
+            text: ' La respuesta se eliminara definitivamente',
+            icon: 'warning',
+            buttons: ['Cancelar', 'Sí'],
+            dangerMode: true
+        }).then((value) => {
+            if (value) {
+                axios.delete(`${REACT_APP_HOST}/api/respuestas/` + id_resp).then((response) => {
+                    if (response.data) {
+                        Swal({
+                            title: 'Respuesta eliminada exitosamente',
+                            text: 'ok',
+                            icon: 'success',
+                            timer: 2000,
+                            button: false
+                        })
+                        this.getRespuestas();
+                        this.setState({respuesta: '', estadoresp: false, _idresp: ''});
+                    }
+                })
+            }
+        })
+    }
     render() {
 
         const {errors} = this.state;
         return (
-                <div className="containerList">
-                    <br/>
-                    <Button size="sm" color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFile}/> Nueva Tarea</Button>
-                    <br/>
-                    <br/>
-                    {this.state.talleres.length > 0 ?
+                <div>
+                    <Navigation />
+                    <div className="containerList">
+                        <br/>
+                        <Button size="sm" color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFile}/> Nueva Tarea</Button>
+                        <br/>
+                        <br/>
+                        {this.state.talleres.length > 0 ?
                                     <Table>
                                         <thead>
                                             <tr>
                                                 <th>AREA</th>
                                                 <th>TALLER</th>
                                                 <th>DESCRIPCION</th>
-                                                <th>IMG_DIR</th>
-                                                <th>VD_DIR</th>
-                                                <th>EVALUAR</th>
-                                                <th>ACCIONES</th>
-                                            </tr>
+                                                <th><FontAwesomeIcon icon={faClock}/></th>
+                                        <th><FontAwesomeIcon icon={faRedo}/></th>
+                                        <th>IMG_DIR</th>
+                                        <th>VD_DIR</th>
+                                        <th>EVALUAR</th>
+                                        <th>ACCIONES</th>
+                                        </tr>
                                         </thead>
                                         <tbody>
                                             {
-                                        this.state.talleres.map(data => {
-                                            return(
-                                                                            <tr key={data._id}>
-                                                                                <td>{data.talleresArea.title}</td>
-                                                                                <td>{data.title}</td>
-                                                                                <td>{data.description}</td>                                                                   
-                                                                                <td>{data.image}</td>
-                                                                                <td>{data.video}</td>
-                                                                                <td> <Button color="info" size="sm" onClick={() => {
-                                                                                    this.showModalEval(data._id)
-                                                                                }}>Crear <FontAwesomeIcon icon={faFileAlt}/></Button></td>
-                                                                
-                                                                                <td>
-                                                                                    <Button color="warning" onClick={() => {
-                                                                                    this.showModal();
-                                                                                    this.editTaller(data._id);
+                                                        this.state.talleres.map(data => {
+                                                            return(
+                                                                <tr key={data._id}>
+                                                                    <td>{data.talleresArea.title}</td>
+                                                                    <td>{data.title}</td>
+                                                                    <td>{data.description}</td>                                                                   
+                                                                    <td>{data.tiempo} {'min'}</td>                                                                   
+                                                                    <td>{data.intentos}</td>                                                                   
+                                                                    <td>{data.image}</td>
+                                                                    <td>{data.video}</td>
+                                                                    <td> <Button color="info" size="sm" onClick={() => {
+                                                                                                this.showModalEval(data._id)
+                                                                                                     }}>Crear <FontAwesomeIcon icon={faFileAlt}/></Button></td>
+                                                
+                                                                    <td>
+                                                                        <Button color="warning" onClick={() => {
+                                                                                                this.showModal();
+                                                                                                this.editTaller(data._id);
                                                                                                     }} size="sm"><FontAwesomeIcon icon={faEdit}/></Button>{' '}
-                                                                
-                                                                                    <Button color="danger" onClick={ () => {
-                                                                                    this.deleteTaller(data._id)
-                                                                                }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
-                                                                                </td>
-                                                                            </tr>
-                                                    )
-                                        })
+                                                
+                                                                        <Button color="danger" onClick={ () => {
+                                                                                                this.deleteTaller(data._id)
+                                                                                                    }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
+                                                                    </td>
+                                                                </tr>
+                                                                    )
+                                                        })
                                             }
                                         </tbody>
                                     </Table>
-                            : <h1>No hay talleres registrados</h1>}
-                    <Modal isOpen={this.state.modalOpen}>
-                        <ModalHeader>
-                            <div><h3>{this.state.header}</h3></div>
-                        </ModalHeader>
+                                    : <h1>No hay talleres registrados</h1>}
+                        <Modal isOpen={this.state.modalOpen}>
+                            <ModalHeader>
+                                <div><h3>{this.state.header}</h3></div>
+                            </ModalHeader>
                 
-                        <ModalBody>
-                            <form onSubmit={this.addTaller} className="container">
-                                <div className="row">
-                                    <select  name="area_id" onChange={this.handleChange} value={this.state.area_id} className="form-control">
-                                        <option>Seleccione una Area</option>
-                                        {
-                    this.state.areas.map(data => {
-                        return(
-                                                                <option key={data._id} value={data._id}>{data.title}</option>
-                                                        );
-                    })
-                                        }
-                                    </select>
-                                    {errors.area_id && <P errors={errors.area_id} />}
-                                </div>
-                                <br/>
-                                <div className="row">
-                                    <input name="title" onChange={this.handleChange} type="text" className="form-control" placeholder="Title" value={this.state.title}/>
-                                    {errors.title && <P errors={errors.title} />}
-                                </div>
-                                <br/>
-                                <div className="row">
-                                    <textarea name="description" onChange={this.handleChange} type="text" className="form-control" placeholder="Description" value={this.state.description}/>
-                                    {errors.description && <P errors={errors.description} />}
-                                </div>                            
-                                <br/>
-                                <div className="row">
-                                    <CustomInput name="image" type="file" onChange={this.handleImageUpload} id="image" label='Seleccione una Imagen' accept="image/png, .jpeg, .jpg"/>
-                                    {errors.image && <P errors={errors.image} />}
-                                </div>
-                                <br/>
+                            <ModalBody>
+                                <form onSubmit={this.addTaller} className="container">
+                                    <div className="row py-2">
+                                        <select  name="area_id" onChange={this.handleChange} value={this.state.area_id} className="form-control">
+                                            <option>Seleccione una Area</option>
+                                            {
+                                                this.state.areas.map(data => {
+                                                    return(
+                                        <option key={data._id} value={data._id}>{data.title}</option>
+                                                            );
+                                                })
+                                            }
+                                        </select>
+                                        {errors.area_id && <P errors={errors.area_id} />}
+                                    </div>
+                                    <div className="row py-2">
+                                        <input name="title" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Title" value={this.state.title}/>
+                                        {errors.title && <P errors={errors.title} />}
+                                    </div>
                 
-                                {this.state.videoload ?
-                                    <div className="row">
+                                    <div className="row py-2">
+                                        <textarea name="description" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Description" value={this.state.description}/>
+                                        {errors.description && <P errors={errors.description} />}
+                                    </div>                            
+                
+                                    <div className="row py-2">
+                                        <CustomInput className='form-control form-control-sm' name="image" type="file" onChange={this.handleImageUpload} id="image" label='Seleccione una Imagen' accept="image/png, .jpeg, .jpg"/>
+                                        {errors.image && <P errors={errors.image} />}
+                                    </div>
+                
+                                    {this.state.videoload ?
+                                    <div className="row py-2">
                                         <CustomInput name="video" type="file" onChange={this.handleVideoUpload} id="video" label='Seleccione una Presentación' accept="video/mp4, .vlc, .avi"/>
                                     </div>
-                            : <p style={{color: 'blue', fontSize: 12}}>Para cargar una presentacion utilize la opcion Editar</p>}
-                                <br/>
-                                <Button id="btnInsertar">{this.state.textButton}</Button>{' '}
-                                <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
-                            </form>
-                        </ModalBody>               
-                    </Modal>
+                                                : <p style={{color: 'blue', fontSize: 12}}>Para cargar una presentacion utilize la opcion Editar</p>
+                                    }
+                                    <div className="row py-2 border bg-info">
+                                        <div className="col-md-4 text-center">
+                                            <p className="font-weight-bold" style={{fontSize: 13}}>Esta sección en caso de evaluación</p>                
+                                        </div>
+                                        <div className="col-md-4">
+                                            <input type="number" name="tiempo" onChange={this.handleChange} value={this.state.tiempo} className="form-control form-control-sm" placeholder="Tiempo de eval"/>
+                
+                                        </div>
+                                        <div className="col-md-4">
+                                            <input type="number" name="intentos" onChange={this.handleChange} value={this.state.intentos} className="form-control form-control-sm" placeholder="Intentos eval"/>
+                
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <Button size='sm' id="btnInsertar">{this.state.textButton}</Button>{' '}
+                                    <Button size='sm' id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
+                                </form>
+                            </ModalBody>               
+                        </Modal>
                 
                 
-                    <Modal isOpen={this.state.modalEval} size="lg">
-                        <ModalHeader>
-                            <div><h3>Crear Preguntas de Evaluación</h3></div>
-                        </ModalHeader>
-                        <ModalBody>
-                            <form onSubmit={this.addPregunta} className="container">
-                
+                        <Modal isOpen={this.state.modalEval} size="lg">
+                            <div className='p-2 border'>
                                 <Row>
-                                    <Col xs="12">
-                                    <input type="hidden" name="id" value={this.state.idtaller}/>
-                                    <input type="text" name="pregunta" onChange={this.handleChange} value={this.state.pregunta} className="form-control form-control-sm" placeholder="Ingrese la pregunta" required/>   
+                                    <Col xs='11'>
+                                    <h4>Preguntas y Respuestas</h4>
+                                    </Col>
+                                    <Col xs='1'>
+                                    <Button color="secondary" size="sm" onClick={() => {
+                                            this.hideModalEval()
+                                                }}>X</Button>
                                     </Col>
                                 </Row>
-                                <br/>
-                                <Row>
-                                    <Col xs="12">                
-                                    <ul id="lista">
-                                        <li className="list-unstyled">
+                            </div>               
+                            <ModalBody>
+                                <h6>Registre sus preguntas</h6>
+                                <form onSubmit={this.addPregunta} className="container border p-3">
+                
+                                    <Row>
+                                        <Col xs="12">
                                         <Row>               
+                                            <Col xs="7">
+                                            <textarea type="text" name="pregunta" onChange={this.handleChange} value={this.state.pregunta} className="form-control form-control-sm" placeholder="Ingrese la pregunta" required/>   
+                                            </Col>
+                                            <Col xs="2">  
+                                            <input type='number' name='puntaje' onChange={this.handleChange} value={this.state.puntaje} className="form-control form-control-sm" placeholder="Puntaje" required/>                             
+                                            </Col>
+                                            <Col xs="1">              
+                                            <input type="checkbox" name="estadopreg" onChange={this.handleChange} checked={this.state.estadopreg} className="form-control form-control-sm"/> 
+                                            </Col>                                        
+                                            <Col xs="2">
+                                            <Button size="sm" color="primary"><FontAwesomeIcon icon={faSave}/> {this.state.btnCreaPreg}</Button>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col xs="10" className="mt-2">
+                                            <select  name="pregunta_id" onChange={this.handleChange} value={this.state.pregunta_id} className="form-control form-control-sm">
+                                                <option>Seleccione una Pregunta</option>
+                
+                                                {
+                                                    this.state.preguntas_taller.map(data => {
+                                                        return(
+                                        <option key={data._id} value={data._id}>{data.pregunta} {'    / Puts: '} {data.puntaje}</option>
+                                                                );
+                                                    })
+                                                }
+                                            </select>                                    
+                                            </Col>                                      
+                                            <Col xs="2"  className="mt-2">                                      
+                                            <Button size="sm" color="warning" onClick={() => {
+                                                    this.editPregunta(this.state.pregunta_id)
+                                                        }}><FontAwesomeIcon icon={faEdit}/></Button>  {' '}
+                                            <Button size="sm" color="danger" onClick={() => {
+                                                    this.deletePregunta(this.state.pregunta_id)
+                                                        }}><FontAwesomeIcon icon={faTrash}/></Button> 
+                                            </Col>                                      
+                                        </Row>
+                                        </Col>
+                                    </Row>
+                                </form>
+                
+                                <hr/>
+                                <h6>Registre sus respuestas</h6>
+                                <form onSubmit={this.addRespuesta} className="container border p-3">
+                                    <Row>
+                                        <Col xs="12">                
+                                        <Row>
+                                            <Col xs="10">
+                                            <select  name="pregunta_resp" onChange={this.handleChangeSelect} value={this.state.pregunta_resp} className="form-control form-control-sm">
+                                                <option>Seleccione una Pregunta</option>                                  
+                                                {
+                                                    this.state.preguntas_taller.map(data => {
+                                                        return(
+                                        <option key={data._id} value={data._id}>{data.pregunta}</option>
+                                                                );
+                                                    })
+                                                }
+                                            </select> 
+                                            </Col>
+                                            <Col xs="2">
+                                            </Col>
+                                        </Row>
+                                        <Row className="mt-2">               
                                             <Col xs="9">
                                             <input type="text" name="respuesta" onChange={this.handleChange} value={this.state.respuesta} className="form-control form-control-sm" placeholder="Ingrese una respuesta" required/> 
                                             </Col>
+                
                                             <Col xs="1">              
                                             <input type="checkbox" name="estadoresp" onChange={this.handleChange} checked={this.state.estadoresp} className="form-control form-control-sm"/> 
                                             </Col>
-                                            <Col xs="1">
+                                            <Col xs="2"> 
+                                            <Button size="sm" color="primary"><FontAwesomeIcon icon={faSave}/> {this.state.btnCreaResp}</Button>               
                                             </Col>
                                         </Row>
-                                        </li>
-                                    </ul>
-                                    </Col>
-                                    <a href="#" id="agregarRespuesta" onClick={this.agregarRespuesta}>Agregar Respuesta</a>
-                                </Row>
-                                <Row className="float-right">               
-                                    <Button size="sm" color="primary">Registrar Pregunta</Button>
-                
-                                </Row>
+                                        </Col>
+                                    </Row>
+                                </form>
                                 <br/>
                                 <br/>
                 
-                                <Row>
-                                    <Table>
+                                <Row className="container">
+                                    <Table style={{fontSize: 12}}>
                                         <thead>
                                             <tr>
-                                                <th>Preguntas</th>
+                                                <th>Pregunta</th>
+                                                <th>Respuestas</th>
+                                                <th>Estado</th>
                                                 <th>Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                
+                                            {
+                                                this.state.respuestas_preg.map(data => {
+                                                    return(
+                                        <tr key={data.respuestas._id}>
+                                            <td>{data.pregunta}</td>
+                                            <td>{data.respuestas.respuesta}</td>
+                                            {
+                                                                            data.respuestas.estadoresp === true ?
+                                                                    <td style={{color: 'green'}}><FontAwesomeIcon icon={faCheckCircle}/></td>
+                                                                            :
+                                                                    <td style={{color: 'red'}}><FontAwesomeIcon icon={faSkull}/></td>
+                                    }
+                                    <td>
+                                        <Button color="warning" onClick={() => {
+
+                                                                            this.editRespuesta(data.respuestas._id);
+                                                                                }} size="sm"><FontAwesomeIcon icon={faEdit}/></Button>{' '}
+            
+                                        <Button color="danger" onClick={ () => {
+                                                                            this.deleteRespuesta(data.respuestas._id)
+                                                                                }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
+                                    </td>
+                                    </tr>
+                                                        )
+                                            })
+                                        }
                                         </tbody>
                                     </Table>                
                                 </Row>
-                                <Row className="float-right">
-                                    <Button color="danger" size="sm" onClick={() => {
-                        this.hideModalEval()
-                    }}>Cancelar</Button>
-                                </Row>               
-                            </form>
                 
-                        </ModalBody>                
                 
-                    </Modal>
+                            </ModalBody>                
+                
+                        </Modal>
+                    </div>
                 </div>
 
                 );

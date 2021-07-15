@@ -2,33 +2,110 @@
     box-shadow: 1px 1px 4px #6a6b6b;
 }
 .card_taller:hover{
-  top: 2px;
-  box-shadow: 4px 4px 7px #6a6b6b;
+    top: 2px;
+    box-shadow: 4px 4px 7px #6a6b6b;
 }
 .image{
-   opacity: 1 
+    opacity: 1 
 }
 .image:hover{
-   opacity: 1
+    opacity: 1
 }
 
 .containerFluid{
-   position: relative;
-   background: #EDEDEF;
-   align-content: center;
-   left: 7%;
-   width: 90%;
-   /*display: flex;*/
+    position: relative;
+    background: #EDEDEF;
+    align-content: center;
+    left: 7%;
+    width: 90%;
+    /*display: flex;*/
 }
 .containerList{
-   position: relative;
-   align-content: center;
-   left: 7%;
-   width: 80%;
-   /*display: flex;*/
+    position: relative;
+    align-content: center;
+    left: 4%;
+    width: 90%;
+    /*display: flex;*/
 }
 .reactPlayer{
     position: absolute;
     top: 0;
     left: 0;
+}
+
+body{
+    background-color: #d9faf1;
+}
+
+.main-section{
+    margin:0 auto;
+}
+.modal-content{
+    box-shadow: 0px 0px 4px #6a6b6b;   
+}
+
+.img-user{
+    margin-top: -50px;
+    margin-bottom: 15px;
+}
+.img-user img{
+    width: 100px;
+    height: 100px;
+    box-shadow: 0px 0px 4px #6a6b6b;
+    border-radius: 50px;
+}
+
+.mano{
+    cursor:pointer;
+}
+
+#subMenu a{
+    display: block;
+    color: white;
+    text-decoration: none;
+
+
+}
+#subMenu a:hover{
+    display: block;
+    font-weight: bold;
+    text-decoration: none;
+    background: white;
+    color: darkgray;
+
+}
+
+#menu li a{
+    display: block;
+    color: white;
+
+}
+#menu li a:hover{
+    display: block;
+    color: white;
+    background: gray;
+    opacity: 1;
+
+}
+#menu li a:focus{
+    display: block;
+    color: white;
+    background: gray;
+    opacity: 0.5;
+}
+
+
+.support:hover{
+    font-weight: bold;
+}
+
+.fa-headset{
+    color: white;
+}
+.fa-user-tie{
+    color: white;
+}
+
+.user-namefont{
+    font-size: 12px;
 }

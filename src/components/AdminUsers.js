@@ -5,9 +5,17 @@ import Swal from 'sweetalert';
 import axios from 'axios'
 import P from '../components/P';
 import Styles from '../index.css'
+import md5 from 'md5';
+
+import Navigation from '../components/Navigation';
+import Breadcrumb_nav from '../components/Breadcrumb_nav';
+import Cookies from 'universal-cookie';
 
 
-        const {REACT_APP_HOST} = process.env;
+
+const cookies = new Cookies();
+
+const {REACT_APP_HOST} = process.env;
 
 const validation = data => {
     const errors = {};
@@ -19,6 +27,12 @@ const validation = data => {
     }
     if (!data.cedula) {
         errors.cedula = 'El campo cédula es obligatorio';
+    }
+    if (!data.user) {
+        errors.user = 'El campo user es obligatorio';
+    }
+    if (!data.pass) {
+        errors.pass = 'El campo password es obligatorio';
     }
     if (!data.rol) {
         errors.rol = 'El rol es un campo obligatorio';
@@ -32,6 +46,8 @@ class AdminUsers extends Component {
             nombre: '',
             apellido: '',
             cedula: '',
+            user: '',
+            pass: '',
             rol: '',
             _id: '',
             users: [],
@@ -70,6 +86,8 @@ class AdminUsers extends Component {
             datos.append('nombre', this.state.nombre);
             datos.append('apellido', this.state.apellido);
             datos.append('cedula', this.state.cedula);
+            datos.append('user', this.state.user);
+            datos.append('pass', this.state.pass);
             datos.append('rol', this.state.rol);
             datos.append('image', this.state.image);
             if (this.state._id) {
@@ -81,7 +99,7 @@ class AdminUsers extends Component {
                         button: false
                     });
                     this.getUsers();
-                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '...', errors: {}});
+//                    this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '...', errors: {}});
                 })
             } else {
                 axios.post(`${REACT_APP_HOST}/api/users`, datos).then((response) => {
@@ -92,9 +110,11 @@ class AdminUsers extends Component {
                         button: false
                     });
                     this.getUsers();
-                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', image: '...'})
+//                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', image: '...'})
                 })
             }
+            this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '...', errors: {}});
+
         }
 
     }
@@ -106,11 +126,13 @@ class AdminUsers extends Component {
                 nombre: response.data.nombre,
                 apellido: response.data.apellido,
                 cedula: response.data.cedula,
+                user: response.data.user,
+                pass: response.data.pass,
                 rol: response.data.rol,
                 image: response.data.image,
                 _id: response.data._id,
                 textButton: 'ACTUALIZAR',
-                header: 'Actualizar Usuario',
+                header: 'Actualizar Usuario'
             })
             console.log(this.state.image)
         })
@@ -143,7 +165,7 @@ class AdminUsers extends Component {
         this.setState({modalOpen: true});
     }
     hideModal() {
-        this.setState({nombre: '', apellido: '', cedula: '', rol: '', modalOpen: false, textButton: 'REGISTRAR', header: 'Insertar Usuario', image: '...'})
+        this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', modalOpen: false, textButton: 'REGISTRAR', header: 'Insertar Usuario', image: '...', errors: {}})
     }
 
     handleChange(e) {
@@ -160,14 +182,16 @@ class AdminUsers extends Component {
     render() {
         const {errors} = this.state;
         return (
-                <div className="containerList">
+                <div>
+                    <Navigation />
+                    <div className="containerList">
                 
                 
-                    <br/>
-                    <Button color="primary" onClick={this.showModal}>Nuevo Usuario</Button>
-                    <br/>
-                    <br/>
-                    {this.state.users.length>0?
+                        <br/>
+                        <Button color="primary" onClick={this.showModal}>Nuevo Usuario</Button>
+                        <br/>
+                        <br/>
+                        {this.state.users.length > 0 ?
                                     <Table>
                                         <thead>
                                             <tr>
@@ -180,8 +204,8 @@ class AdminUsers extends Component {
                                         </thead>
                                         <tbody>
                                             {
-                                                    this.state.users.map(data => {
-                                                        return(
+                                                        this.state.users.map(data => {
+                                                            return(
                                                                 <tr key={data._id}>
                                                                     <td>{data.nombre}</td>
                                                                     <td>{data.apellido}</td>
@@ -190,62 +214,67 @@ class AdminUsers extends Component {
                                                                     <td>{data.image}</td>
                                                                     <td>
                                                                         <Button color="warning" onClick={() => {
-                                                                                            this.showModal();
-                                                                                            this.editUser(data._id);
-                                                                                                }}>Edit</Button>{' '}
-                                                    
+                                                                                                this.showModal();
+                                                                                                this.editUser(data._id);
+                                                                                                    }}>Edit</Button>{' '}
+                                                
                                                                         <Button color="danger" onClick={ () => {
-                                                                                            this.deleteUser(data._id)
-                                                                                                }}>Delete</Button>
+                                                                                                this.deleteUser(data._id)
+                                                                                                    }}>Delete</Button>
                                                                     </td>
                                                                 </tr>
-                                                                )
-                                                    })
+                                                                    )
+                                                        })
                                             }
                                         </tbody>
                                     </Table>
-                                : <h1>No hay Usuarios registrados</h1>}
-                    <Modal isOpen={this.state.modalOpen}>
-                        <ModalHeader>
-                            <div><h3>{this.state.header}</h3></div>
-                        </ModalHeader>
+                                    : <h1>No hay Usuarios registrados</h1>}
+                        <Modal isOpen={this.state.modalOpen}>
+                            <ModalHeader>
+                                <div><h3>{this.state.header}</h3></div>
+                            </ModalHeader>
                 
-                        <ModalBody>
-                            <form onSubmit={this.addUser} className="container">
-                                <div className="row">
-                                    <input name="nombre" onChange={this.handleChange} type="text" className="form-control" placeholder="Nombres" value={this.state.nombre}/>
-                                    {errors.nombre && <P errors={errors.nombre} />}
-                                </div>
-                                <br/>
-                                <div className="row">
-                                    <input name="apellido" onChange={this.handleChange} type="text" className="form-control" placeholder="Apellidos" value={this.state.apellido}/>
-                                    {errors.apellido && <P errors={errors.apellido} />}
-                                </div>                            
-                                <br/>
-                                <div className="row">
-                                    <input name="cedula" onChange={this.handleChange} type="number" className="form-control" placeholder="Cedula" value={this.state.cedula}/>
-                                    {errors.cedula && <P errors={errors.cedula} />}
-                                </div>                            
-                                <br/>
-                                <div className="row">
-                                    <select className="form-control" name="rol" onChange={this.handleChange} value={this.state.rol}>
-                                        <option>Selecione un Rol</option>
-                                        <option value="USUARIO">USUARIO</option>
-                                        <option value="ADMINISTRADOR">ADMINISTRADOR</option>
-                                    </select>
-                                    {errors.rol && <P errors={errors.rol} />}
-                                </div>                            
-                                <br/>
-                                <div className="row">
-                                    <CustomInput name="image" type="file" onChange={this.handleImageUpload} id="image" label='Seleccione una Foto' accept="image/png, .jpeg, .jpg"/>
-                                </div>
-                                <br/>
+                            <ModalBody>
+                                <form onSubmit={this.addUser} className="container">
+                                    <div className="row">
+                                        <input name="nombre" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Nombres" value={this.state.nombre}/>
+                                        {errors.nombre && <P errors={errors.nombre} />}
+                                    </div>
+                                    <div className="row my-2">
+                                        <input name="apellido" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Apellidos" value={this.state.apellido}/>
+                                        {errors.apellido && <P errors={errors.apellido} />}
+                                    </div>                            
+                                    <div className="row">
+                                        <input name="cedula" onChange={this.handleChange} type="number" className="form-control form-control-sm" placeholder="Cedula" value={this.state.cedula}/>
+                                        {errors.cedula && <P errors={errors.cedula} />}
+                                    </div> 
+                                    <div className="row my-2">
+                                        <input name="user" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Nombre de usuario" value={this.state.user}/>
+                                        {errors.user && <P errors={errors.user} />}
+                                    </div>
+                                    <div className="row">
+                                        <input name="pass" onChange={this.handleChange} type="password" className="form-control form-control-sm" placeholder="Password" value={this.state.pass}/>
+                                        {errors.pass && <P errors={errors.pass} />}
+                                    </div>
+                                    <div className="row">
+                                        <select className="form-control form-control-sm my-2" name="rol" onChange={this.handleChange} value={this.state.rol}>
+                                            <option>Selecione un Rol</option>
+                                            <option value="USUARIO">USUARIO</option>
+                                            <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                                        </select>
+                                        {errors.rol && <P errors={errors.rol} />}
+                                    </div>                            
+                                    <div className="row">
+                                        <CustomInput className="form-control-sm" name="image" type="file" onChange={this.handleImageUpload} id="image" label='Seleccione una Foto' accept="image/png, .jpeg, .jpg"/>
+                                    </div>
+                                    <br/>
                 
-                                <Button id="btnInsertar">{this.state.textButton}</Button>{' '}
-                                <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
-                            </form>
-                        </ModalBody>               
-                    </Modal>
+                                    <Button id="btnInsertar">{this.state.textButton}</Button>{' '}
+                                    <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
+                                </form>
+                            </ModalBody>               
+                        </Modal>
+                    </div>
                 </div>
 
                 );

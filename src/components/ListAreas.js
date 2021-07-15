@@ -4,8 +4,14 @@ import {Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, fo
 import axios from 'axios';
 import{Link} from'react-router-dom';
 import {render}from'react-dom';
+import Navigation from '../components/Navigation';
+import Breadcrumb_nav from '../components/Breadcrumb_nav';
+
+import Cookies from 'universal-cookie';
 
 
+
+const cookies = new Cookies();
 //import env from "react-dotenv";
 const{REACT_APP_HOST} = process.env;
 
@@ -27,6 +33,9 @@ export default class ListAreas extends Component {
     }
 
     componentDidMount() {
+        if (!cookies.get('nombre')) {
+            window.location.href = '/'
+        }
         this.getTalleres();
     }
     getTalleres() {
@@ -43,6 +52,8 @@ export default class ListAreas extends Component {
 
 
         return (
+                <div>
+                 <Navigation />
                 <Container>
                     <div className="row my-5">
                 
@@ -70,6 +81,7 @@ export default class ListAreas extends Component {
                 
                     </div>
                 </Container>
+                </div>
                 )
     }
 }

@@ -6,8 +6,15 @@ import axios from 'axios'
 import P from '../components/P';
 import Styles from '../index.css'
 
+import Navigation from '../components/Navigation';
+import Breadcrumb_nav from '../components/Breadcrumb_nav';
+import Cookies from 'universal-cookie';
 
-        const {REACT_APP_HOST} = process.env;
+
+
+const cookies = new Cookies();
+
+const {REACT_APP_HOST} = process.env;
 
 const validation = data => {
     const errors = {};
@@ -41,6 +48,9 @@ class AdminAreas extends Component {
         this.addArea = this.addArea.bind(this)
     }
     componentDidMount() {//Es como el initComponents
+        if (!cookies.get('nombre')) {
+            window.location.href = '/'
+        }
         this.getAreas();//Para que inicie la pantalla de tareas
     }
     getAreas() {
@@ -148,12 +158,14 @@ class AdminAreas extends Component {
 
         const {errors} = this.state;
         return (
-                <div className="containerList">
-                    <br/>
-                    <Button color="primary" onClick={this.showModal}>Nueva Area</Button>
-                    <br/>
-                    <br/>
-                    {this.state.areas.length > 0 ?
+                <div>
+                    <Navigation />
+                    <div className="containerList">
+                        <br/>
+                        <Button color="primary" onClick={this.showModal}>Nueva Area</Button>
+                        <br/>
+                        <br/>
+                        {this.state.areas.length > 0 ?
                                     <Table>
                                         <thead>
                                             <tr>
@@ -165,57 +177,58 @@ class AdminAreas extends Component {
                                         </thead>
                                         <tbody>
                                             {
-                                                    this.state.areas.map(data => {
-                                                        return(
+                                                        this.state.areas.map(data => {
+                                                            return(
                                                                 <tr key={data._id}>
                                                                     <td>{data.title}</td>
                                                                     <td>{data.description}</td>
                                                                     <td>{data.image}</td>
                                                                     <td>
                                                                         <Button color="warning" onClick={() => {
-                                                                                            this.showModal();
-                                                                                            this.editArea(data._id);
-                                                                                                }}>Edit</Button>{' '}
-                                                    
+                                                                                                this.showModal();
+                                                                                                this.editArea(data._id);
+                                                                                                    }}>Edit</Button>{' '}
+                                                
                                                                         <Button color="danger" onClick={ () => {
-                                                                                            this.deleteArea(data._id)
-                                                                                                }}>Delete</Button>
+                                                                                                this.deleteArea(data._id)
+                                                                                                    }}>Delete</Button>
                                                                     </td>
                                                                 </tr>
-                                                                )
-                                                    })
+                                                                    )
+                                                        })
                                             }
                                         </tbody>
                                     </Table>
-                                : <h1>No hay Areas registrados</h1>}
-                    <Modal isOpen={this.state.modalOpen}>
-                        <ModalHeader>
-                            <div><h3>{this.state.header}</h3></div>
-                        </ModalHeader>
+                                    : <h1>No hay Areas registrados</h1>}
+                        <Modal isOpen={this.state.modalOpen}>
+                            <ModalHeader>
+                                <div><h3>{this.state.header}</h3></div>
+                            </ModalHeader>
                 
-                        <ModalBody>
-                            <form onSubmit={this.addArea} className="container">
-                                <div className="row">
-                                    <input name="title" onChange={this.handleChange} type="text" className="form-control" placeholder="Title" value={this.state.title}/>
-                                    {errors.title && <P errors={errors.title} />}
-                                </div>
-                                <br/>
-                                <div className="row">
-                                    <textarea name="description" onChange={this.handleChange} type="text" className="form-control" placeholder="Description" value={this.state.description}/>
+                            <ModalBody>
+                                <form onSubmit={this.addArea} className="container">
+                                    <div className="row">
+                                        <input name="title" onChange={this.handleChange} type="text" className="form-control" placeholder="Title" value={this.state.title}/>
+                                        {errors.title && <P errors={errors.title} />}
+                                    </div>
+                                    <br/>
+                                    <div className="row">
+                                        <textarea name="description" onChange={this.handleChange} type="text" className="form-control" placeholder="Description" value={this.state.description}/>
                 
-                                </div>                            
-                                <br/>
-                                <div className="row">
-                                    <CustomInput name="image" type="file" onChange={this.handleImageUpload} id="image" label='Seleccione una Imagen' accept="image/png, .jpeg, .jpg"/>
-                                    {errors.image && <P errors={errors.image} />}
-                                </div>
-                                <br/>
+                                    </div>                            
+                                    <br/>
+                                    <div className="row">
+                                        <CustomInput name="image" type="file" onChange={this.handleImageUpload} id="image" label='Seleccione una Imagen' accept="image/png, .jpeg, .jpg"/>
+                                        {errors.image && <P errors={errors.image} />}
+                                    </div>
+                                    <br/>
                 
-                                <Button id="btnInsertar">{this.state.textButton}</Button>{' '}
-                                <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
-                            </form>
-                        </ModalBody>               
-                    </Modal>
+                                    <Button id="btnInsertar">{this.state.textButton}</Button>{' '}
+                                    <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
+                                </form>
+                            </ModalBody>               
+                        </Modal>
+                    </div>
                 </div>
 
                 );
