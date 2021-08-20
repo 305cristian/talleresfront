@@ -198,6 +198,7 @@ class AdminUsers extends Component {
                                                 <th>NOMBRE</th>
                                                 <th>APELLIDO</th>
                                                 <th>CEDULA</th>
+                                                <th>USUARIO</th>
                                                 <th>ROL</th>
                                                 <th>IMAGE</th>
                                             </tr>
@@ -210,6 +211,7 @@ class AdminUsers extends Component {
                                                                     <td>{data.nombre}</td>
                                                                     <td>{data.apellido}</td>
                                                                     <td>{data.cedula}</td>
+                                                                    <td>{data.user}</td>
                                                                     <td>{data.rol}</td>
                                                                     <td>{data.image}</td>
                                                                     <td>

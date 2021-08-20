@@ -19,6 +19,9 @@ class login extends Component {
             pass: '',
             user_session: []
         }
+        
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+
     }
 
     componentDidMount() {
@@ -32,6 +35,14 @@ class login extends Component {
         this.setState({[name]: value})
 //        console.log(e.target.value)
     }
+
+ handleKeyPress(e) {
+     
+    if (e.key === 'Enter') {
+      console.log('do validate');
+      this.login_session();
+    }
+  }
 
     login_session() {
         axios.get(`${REACT_APP_HOST}/api/users/` + this.state.user + '/' + this.state.pass).then((response) => {
@@ -81,7 +92,7 @@ class login extends Component {
                                             <div className="input-group-prepend">
                                                 <span className="input-group-text"><FontAwesomeIcon icon={faKey}/></span>
                                             </div>    
-                                            <input name="pass" type="password" required="" id="pass" onChange={this.handleChange} className="form-control" placeholder="Contraseña"/>      
+                                            <input name="pass" type="password" required="" id="pass" onKeyPress={this.handleKeyPress} onChange={this.handleChange} className="form-control" placeholder="Contraseña"/>      
                                         </div>
                 
                                         <div className="form-group">

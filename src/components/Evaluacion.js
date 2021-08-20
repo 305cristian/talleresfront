@@ -9,6 +9,10 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Swal from 'sweetalert';
 import '../libraries/back';
 
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies;
+
 const{REACT_APP_HOST, REACT_APP_DIREC} = process.env;
 
 var resp_correcta = [];
@@ -29,8 +33,10 @@ var minutos = 0;
 var segundos = 59;
 var estado_tiempo = true;
 
-var intentos = 0;
+var id_taller = '0';
 
+var intentos = 0;
+var interval = '';
 class Evaluacion extends Component {
 
     constructor() {
@@ -50,23 +56,36 @@ class Evaluacion extends Component {
     }
 
     componentDidMount() {
+        if (!cookies.get('nombre')) {
+            window.location.href = '/'
+        }
         this.getPreguntasRespuestas();
-        setInterval(this.cargarSegundos, 1000);
+        interval = setInterval(this.cargarSegundos, 1000);
 
     }
 
     getPreguntasRespuestas() {
         const {match} = this.props;
-        const id_taller = match.params.id;
+        id_taller = match.params.id;
         axios.get(`${REACT_APP_HOST}/api/evaluacion/` + id_taller).then((response) => {
             this.setState({preguntas_respuestas: response.data});
             if (this.state.preguntas_respuestas.length === 0) {
                 Swal({
                     title: '!ATENCION',
                     text: 'No hay evaluación registrada',
-                    icon: 'warning'
-                });
+                    icon: 'warning',
+                    closeOnClickOutside: false,
+                    closeOnEsc: false
+
+                }).then((value) => {
+                    if (value) {
+                        window.location.href = `${REACT_APP_DIREC}/home`;
+//                       window.location.href=`${REACT_APP_DIREC}/presentacion/`+id_taller;
+                    }
+                })
+                clearInterval(interval);
             } else {
+                console.log(this.state.preguntas_respuestas)
                 this.mostarEvaluacion();
             }
         });
@@ -80,6 +99,7 @@ class Evaluacion extends Component {
                 respuestas.push(
                         `<label><input type="radio"  name="${numPregunta}" value="${respuestaAct.respuesta}"/> ${respuestaAct.respuesta}</label><br/> `
                         );
+                //Voy almacenando la respuestas correctas de cada pregunta
                 if (respuestaAct.estadoresp === true) {
                     resp_correcta.push(`${respuestaAct.respuesta}`);
                 }
@@ -91,7 +111,7 @@ class Evaluacion extends Component {
                         <div class="respuestas pl-4 pt-2">${respuestas.join('')}</div><hr/>
                     `
                     );
-            puntaje_list.push(preguntaAct.puntaje);
+            puntaje_list.push(preguntaAct.puntaje);//Voy almacenando el puntaje de cada pregunta
 
             preguntaAct.taller.map((taller, index) => {
                 minutos = taller.tiempo - 1;
@@ -99,7 +119,7 @@ class Evaluacion extends Component {
 //                this.setState({intentos: taller.intentos, tiempo: taller.tiempo})
             })
         });
-        this.pintarTiempo(minutos);
+        this.pintarTiempo();
         contenedor_eval.innerHTML = preguntasYrespuestas.join('');
 
     }
@@ -136,11 +156,17 @@ class Evaluacion extends Component {
                     cont_incorrectas++;
                     this.pintarRespuestas(indexPreg, resp_correcta[indexPreg]);
                 }
+
             } else {
                 estado = false;
                 cont_correctas = 0;
                 cont_incorrectas = 0;
-                alert(`La pregunta ${indexPreg + 1} esta sin seleccionar`)
+                Swal({
+                    title: '!Atencion',
+                    text: `La pregunta ${indexPreg + 1} esta sin seleccionar`,
+                    icon: 'warning'
+                })
+//                alert(`La pregunta ${indexPreg + 1} esta sin seleccionar`)
             }
 
         });
@@ -148,6 +174,8 @@ class Evaluacion extends Component {
             this.setState({resultados: true, deshabilitar: true});
             this.bloquearRespuestas();
             window.history.pushState(null, "", "undefinid");
+            clearInterval(interval);
+
 
         } else {
             for (var i = 0; i < this.state.preguntas_respuestas.length; i++) {
@@ -270,7 +298,9 @@ class Evaluacion extends Component {
                 Swal({
                     title: '!ATENCION',
                     text: 'SU TIEMPO HA EXPIRADO',
-                    icon: 'warning'
+                    icon: 'warning',
+                    closeOnClickOutside: false,
+                    closeOnEsc: false
                 }).then((value) => {
                     if (value) {
                         window.location.href = `${REACT_APP_DIREC}/home`;
@@ -288,6 +318,41 @@ class Evaluacion extends Component {
         }
 
         document.getElementById('hora').innerHTML = txtHora;
+
+    }
+
+    sendResp(puntuacion) {
+        var estado = 0;
+        if (puntuacion === 10) {
+            estado = 1;
+        }
+
+        const id_user = cookies.get('id');
+        const datos = {id_user: id_user, id_taller: id_taller, estado: estado};
+
+        axios.post(`${REACT_APP_HOST}/api/user_taller/`, datos).then((response) => {
+            if (response.data) {
+
+                if (puntuacion === 10) {
+                    Swal({
+                        title: 'Tarea Completada',
+                        text: `Su puntuacion es de: ${puntuacion}/10, Felicidades`,
+                        icon: 'success',
+                    }).then((resp) => {
+                        window.location.href = '/home'
+                    });
+                } else {
+                    Swal({
+                        title: 'Tarea Registrada',
+                        text: `Su puntuacion es de: ${puntuacion}/10, Debe acertar en todas las preguntas para completar la tarea, caso contario debera repetir el taller`,
+                        icon: 'warning',
+                    }).then((resp) => {
+                        window.location.href = '/home'
+                    });
+                }
+
+            }
+        })
 
     }
 
@@ -342,13 +407,15 @@ class Evaluacion extends Component {
                                             </div>
                                 
                                             <div  className=" container text-center p-1 my-2">
-                                                <Button size="xs" color='primary' onClick={this.showModalResp}>Enviar Resultados</Button>
+                                                <Button size="xs" color='primary' onClick={() => {
+                                            this.sendResp(puntuacion)
+                                        }}>Enviar Resultados</Button>
                                             </div>
                                         </form>
                                 
                                     </div>
 
-                                : null}
+                            : null}
                 
                     <Modal size='lg' isOpen={this.state.modalOpen}>
                 
@@ -358,32 +425,32 @@ class Evaluacion extends Component {
                             </div>
                             <div className='col-md-1 my-2'>
                                 <Button size='sm' onClick={() => {
-                                        this.hideModal()
-                                            }}>X</Button>                
+                        this.hideModal()
+                    }}>X</Button>                
                             </div>
                         </div>
                         <div className='container border p-3' id='contenedor_resp_correctas'>
                             {
-                                this.state.preguntas_respuestas.map((preg, index) => {
-                                    return(
+                    this.state.preguntas_respuestas.map((preg, index) => {
+                        return(
                                         <Container key={preg._id} >                           
                                             <hr/><label  className='font-weight-bold'>{index + 1}{': '}{preg.pregunta}</label><br/> 
                                             { preg.respuestas.map((resp, index) => {
-                                                                        return(
+                                                        return(
                                                                                 <div key={resp._id} className="pl-4 pt-2">
                                                                                     {resp.estadoresp ?
                                                                                                                             <label className='font-weight-bold' style={{color: 'green'}}><input type='radio' checked disabled/> {resp.respuesta}</label>
-                                                                                                                : <label ><input  type='radio' disabled/> {resp.respuesta}</label>
+                                                                                            : <label ><input  type='radio' disabled/> {resp.respuesta}</label>
                                                                                     }
                                                                 
                                                                                 </div>
 
-                                                                                )
-                                                                    })}
+                                                                )
+                                                                })}
                                         </Container>
                                             )
 
-                                })
+                    })
                             }
                         </div>
                     </Modal>

@@ -34,7 +34,9 @@ const validation = data => {
     }
     return errors;
 }
-
+//Para pintar boton Prueba
+var prueba_regis = [];
+var array=[];
 class AdminTalleres extends Component {
     constructor(props) {
         super(props);
@@ -74,8 +76,7 @@ class AdminTalleres extends Component {
             estadoresp: false,
             btnCreaResp: 'Crear',
             respuestas_preg: [],
-            _idresp: ''
-
+            _idresp: '',
 
         };
 //        this.fileInput = React.createRef();
@@ -110,6 +111,7 @@ class AdminTalleres extends Component {
 //        axios.get(`${REACT_APP_HOST}/api/talleres`).then((response) => {
             console.log(response.data)
             this.setState({talleres: response.data})
+
         })
     }
     addTaller(e) {
@@ -199,7 +201,8 @@ class AdminTalleres extends Component {
                 _id: response.data._id,
                 textButton: 'ACTUALIZAR',
                 header: 'Actualizar Tarea',
-                videoload: true
+                videoload: true,
+
             });
             console.log(this.state.image)
             console.log(this.state.video)
@@ -452,7 +455,9 @@ class AdminTalleres extends Component {
                     button: false
                 });
             }
+
         });
+
     }
 
     editRespuesta(id_resp) {
@@ -486,8 +491,23 @@ class AdminTalleres extends Component {
             }
         })
     }
-    render() {
 
+      prueba_isset(id) {//Este metodo es para pintar el boton de evaluacion
+        axios.get(`${REACT_APP_HOST}/api/preguntas/` + id).then((response) => {
+                if (response.data.length > 0) {
+                    array.push('1');
+                } else {
+                    array.push('0');
+                }
+            return response.data;
+
+        })
+        return array;
+
+    }
+
+    render() {
+        
         const {errors} = this.state;
         return (
                 <div>
@@ -514,37 +534,38 @@ class AdminTalleres extends Component {
                                         </thead>
                                         <tbody>
                                             {
-                                                        this.state.talleres.map(data => {
+                                        this.state.talleres.map((data, index) => {
                                                             return(
-                                                                <tr key={data._id}>
-                                                                    <td>{data.talleresArea.title}</td>
-                                                                    <td>{data.title}</td>
-                                                                    <td>{data.description}</td>                                                                   
-                                                                    <td>{data.tiempo} {'min'}</td>                                                                   
-                                                                    <td>{data.intentos}</td>                                                                   
-                                                                    <td>{data.image}</td>
-                                                                    <td>{data.video}</td>
-                                                                    <td> <Button color="info" size="sm" onClick={() => {
-                                                                                                this.showModalEval(data._id)
-                                                                                                     }}>Crear <FontAwesomeIcon icon={faFileAlt}/></Button></td>
-                                                
-                                                                    <td>
-                                                                        <Button color="warning" onClick={() => {
-                                                                                                this.showModal();
-                                                                                                this.editTaller(data._id);
-                                                                                                    }} size="sm"><FontAwesomeIcon icon={faEdit}/></Button>{' '}
-                                                
-                                                                        <Button color="danger" onClick={ () => {
-                                                                                                this.deleteTaller(data._id)
-                                                                                                    }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
-                                                                    </td>
-                                                                </tr>
-                                                                    )
+                                                                                <tr key={data._id}>
+                                                                                    <td>{data.talleresArea.title}</td>
+                                                                                    <td>{data.title}</td>
+                                                                                    <td>{data.description}</td>                                                                   
+                                                                                    <td>{data.tiempo} {'min'}</td>                                                                   
+                                                                                    <td>{data.intentos}</td>                                                                   
+                                                                                    <td>{data.image}</td>
+                                                                                    <td>{data.video}</td>
+                                                                                    {this.prueba_isset(data._id)}
+                                                                                    <td> <Button color="info" size="sm" onClick={() => {
+                                                                                        this.showModalEval(data._id)
+                                                                                                            }}>{prueba_regis[index] === '1' ? <span>Editar <FontAwesomeIcon icon={faFileAlt}/></span> : <span>Crear <FontAwesomeIcon icon={faFileAlt}/></span>}</Button></td>
+                                                                
+                                                                                    <td>
+                                                                                        <Button color="warning" onClick={() => {
+                                                                                        this.showModal();
+                                                                                                                this.editTaller(data._id);
+                                                                                                            }} size="sm"><FontAwesomeIcon icon={faEdit}/></Button>{' '}
+                                                                
+                                                                                        <Button color="danger" onClick={ () => {
+                                                                                        this.deleteTaller(data._id)
+                                                                                                            }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
+                                                                                    </td>
+                                                                                </tr>
+                                                    )
                                                         })
                                             }
                                         </tbody>
                                     </Table>
-                                    : <h1>No hay talleres registrados</h1>}
+                            : <h1>No hay talleres registrados</h1>}
                         <Modal isOpen={this.state.modalOpen}>
                             <ModalHeader>
                                 <div><h3>{this.state.header}</h3></div>
@@ -556,10 +577,10 @@ class AdminTalleres extends Component {
                                         <select  name="area_id" onChange={this.handleChange} value={this.state.area_id} className="form-control">
                                             <option>Seleccione una Area</option>
                                             {
-                                                this.state.areas.map(data => {
+                    this.state.areas.map(data => {
                                                     return(
-                                        <option key={data._id} value={data._id}>{data.title}</option>
-                                                            );
+                                                                    <option key={data._id} value={data._id}>{data.title}</option>
+                                );
                                                 })
                                             }
                                         </select>
@@ -584,7 +605,7 @@ class AdminTalleres extends Component {
                                     <div className="row py-2">
                                         <CustomInput name="video" type="file" onChange={this.handleVideoUpload} id="video" label='Seleccione una Presentación' accept="video/mp4, .vlc, .avi"/>
                                     </div>
-                                                : <p style={{color: 'blue', fontSize: 12}}>Para cargar una presentacion utilize la opcion Editar</p>
+                            : <p style={{color: 'blue', fontSize: 12}}>Para cargar una presentacion utilize la opcion Editar</p>
                                     }
                                     <div className="row py-2 border bg-info">
                                         <div className="col-md-4 text-center">
@@ -615,8 +636,8 @@ class AdminTalleres extends Component {
                                     </Col>
                                     <Col xs='1'>
                                     <Button color="secondary" size="sm" onClick={() => {
-                                            this.hideModalEval()
-                                                }}>X</Button>
+                        this.hideModalEval()
+                                        }}>X</Button>
                                     </Col>
                                 </Row>
                             </div>               
@@ -646,21 +667,21 @@ class AdminTalleres extends Component {
                                                 <option>Seleccione una Pregunta</option>
                 
                                                 {
-                                                    this.state.preguntas_taller.map(data => {
+                    this.state.preguntas_taller.map(data => {
                                                         return(
-                                        <option key={data._id} value={data._id}>{data.pregunta} {'    / Puts: '} {data.puntaje}</option>
-                                                                );
+                                                                        <option key={data._id} value={data._id}>{data.pregunta} {'    / Puts: '} {data.puntaje}</option>
+                                );
                                                     })
                                                 }
                                             </select>                                    
                                             </Col>                                      
                                             <Col xs="2"  className="mt-2">                                      
                                             <Button size="sm" color="warning" onClick={() => {
-                                                    this.editPregunta(this.state.pregunta_id)
-                                                        }}><FontAwesomeIcon icon={faEdit}/></Button>  {' '}
+                        this.editPregunta(this.state.pregunta_id)
+                                                }}><FontAwesomeIcon icon={faEdit}/></Button>  {' '}
                                             <Button size="sm" color="danger" onClick={() => {
-                                                    this.deletePregunta(this.state.pregunta_id)
-                                                        }}><FontAwesomeIcon icon={faTrash}/></Button> 
+                        this.deletePregunta(this.state.pregunta_id)
+                                                }}><FontAwesomeIcon icon={faTrash}/></Button> 
                                             </Col>                                      
                                         </Row>
                                         </Col>
@@ -677,10 +698,10 @@ class AdminTalleres extends Component {
                                             <select  name="pregunta_resp" onChange={this.handleChangeSelect} value={this.state.pregunta_resp} className="form-control form-control-sm">
                                                 <option>Seleccione una Pregunta</option>                                  
                                                 {
-                                                    this.state.preguntas_taller.map(data => {
+                    this.state.preguntas_taller.map(data => {
                                                         return(
-                                        <option key={data._id} value={data._id}>{data.pregunta}</option>
-                                                                );
+                                                                        <option key={data._id} value={data._id}>{data.pregunta}</option>
+                                );
                                                     })
                                                 }
                                             </select> 
@@ -718,29 +739,29 @@ class AdminTalleres extends Component {
                                         </thead>
                                         <tbody>
                                             {
-                                                this.state.respuestas_preg.map(data => {
+                    this.state.respuestas_preg.map(data => {
                                                     return(
-                                        <tr key={data.respuestas._id}>
-                                            <td>{data.pregunta}</td>
-                                            <td>{data.respuestas.respuesta}</td>
-                                            {
-                                                                            data.respuestas.estadoresp === true ?
-                                                                    <td style={{color: 'green'}}><FontAwesomeIcon icon={faCheckCircle}/></td>
-                                                                            :
-                                                                    <td style={{color: 'red'}}><FontAwesomeIcon icon={faSkull}/></td>
-                                    }
-                                    <td>
-                                        <Button color="warning" onClick={() => {
+                                                                    <tr key={data.respuestas._id}>
+                                                                        <td>{data.pregunta}</td>
+                                                                        <td>{data.respuestas.respuesta}</td>
+                                                                        {
+                                                                        data.respuestas.estadoresp === true ?
+                                                                                                                                <td style={{color: 'green'}}><FontAwesomeIcon icon={faCheckCircle}/></td>
+                                                                                :
+                                                                                                                        <td style={{color: 'red'}}><FontAwesomeIcon icon={faSkull}/></td>
+                                                                }
+                                                                <td>
+                                                                    <Button color="warning" onClick={() => {
 
-                                                                            this.editRespuesta(data.respuestas._id);
-                                                                                }} size="sm"><FontAwesomeIcon icon={faEdit}/></Button>{' '}
-            
-                                        <Button color="danger" onClick={ () => {
+                                                                                                        this.editRespuesta(data.respuestas._id);
+                                                                                                    }} size="sm"><FontAwesomeIcon icon={faEdit}/></Button>{' '}
+                                        
+                                                                    <Button color="danger" onClick={ () => {
                                                                             this.deleteRespuesta(data.respuestas._id)
-                                                                                }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
-                                    </td>
-                                    </tr>
-                                                        )
+                                                                                                    }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
+                                                                </td>
+                                                                </tr>
+                                )
                                             })
                                         }
                                         </tbody>

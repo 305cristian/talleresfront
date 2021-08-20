@@ -8,10 +8,13 @@ import ListTalleres from './components/ListTalleres';
 import ListAreas from './components/ListAreas';
 import AdminTalleres from './components/AdminTalleres';
 import Presentacion from './components/Presentacion'
+import Culminado from './components/Culminado'
 import AdminAreas from './components/AdminAreas'
 import AdminUsers from './components/AdminUsers'
+import AdminResultados from './components/AdminResultados'
 import Evaluacion from './components/Evaluacion'
 import Login from './components/Login'
+import Footer from './components/Footer'
 
 
 
@@ -26,12 +29,15 @@ import Login from './components/Login'
                     <Route path="/adminTask" component={AdminTalleres}/>
                     <Route path="/adminAreas" component={AdminAreas}/>
                     <Route path="/presentacion/:id" component={Presentacion}/>
+                    <Route path="/culminado/:id/:fecha" component={Culminado}/>
                     <Route path="/adminUsers/" component={AdminUsers}/>
+                    <Route path="/adminResultados/" component={AdminResultados}/>
                     <Route path="/evaluacion/:id" component={Evaluacion}/>
                     <Route path="/home" component={ListAreas}/>
                     <Route path="/" render={() => <Login name="Login" />}/>
                     </Switch>
-                
+                                    <Footer/>
+
                 </BrowserRouter>
 
                 )

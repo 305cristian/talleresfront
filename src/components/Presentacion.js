@@ -40,7 +40,7 @@ function Presentacion() {
                 getTaller(response.data);
 //                console.log(response.data)
             });
-        };
+        }
         obtenertaller();
     }, [id]);
 

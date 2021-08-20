@@ -2,7 +2,7 @@ import React, {Component}from 'react';
 import{Link} from'react-router-dom';
 import {render}from'react-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faHeadset, faUserTie} from '@fortawesome/free-solid-svg-icons';
+import {faHeadset, faUserTie, faFeatherAlt} from '@fortawesome/free-solid-svg-icons';
 import Cookies from 'universal-cookie';
 import {Modal, Button, Dropdown, DropdownToggle, DropdownMenu, DropdownItem}from'reactstrap';
 
@@ -52,24 +52,39 @@ export default class Navigation extends Component {
         return(
                 <div>
                     <nav className="navbar navbar-expand-lg navbar-light bg-dark">
-                        <Link className="navbar-brand text-white" to="/home">TAREAS DEL DIA</Link>
+                        <Link className="navbar-brand text-white" to="/home"><FontAwesomeIcon icon={faFeatherAlt}/> TALLERES BY CC</Link>
                         <button className="navbar-toggler bg-white" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon"></span>
                         </button>
                         <div className=" collapse navbar-collapse" id="navbarNav">
                             <ul className=" navbar-nav">
+                            
                                 <li className="nav-item active">
                                     <Link className="nav-link text-white" to="/home">Home</Link>
                                 </li>
+                                
+                                {cookies.get('rol')=='ADMINISTRADOR'?
                                 <li className="nav-item">
                                     <Link className="nav-link text-white"  to="/adminTask">Talleres</Link>
                                 </li>
+                                :''}
+                                
+                                {cookies.get('rol')=='ADMINISTRADOR'?
                                 <li className="nav-item">
                                     <Link className="nav-link text-white"  to="/adminAreas">Areas</Link>
                                 </li>
+                                 :''}
+                                 
+                                {cookies.get('rol')=='ADMINISTRADOR'?
                                 <li className="nav-item">
                                     <Link className="nav-link text-white" to="/adminUsers">Users</Link>
                                 </li>
+                                 :''}
+                                {cookies.get('rol')=='ADMINISTRADOR'?
+                                <li className="nav-item">
+                                    <Link className="nav-link text-white" to="/adminResultados">Resultados</Link>
+                                </li>
+                                 :''}
                 
                             </ul>
                             <ul className="navbar-nav ml-auto">
@@ -89,7 +104,7 @@ export default class Navigation extends Component {
                                     <span style={{fontSize:12, color:'white'}}>{cookies.get('nombre')} {cookies.get('apellido')} </span>
                                     </DropdownToggle>
                                     <DropdownMenu>
-                                        <DropdownItem>Setting</DropdownItem>
+                                       {cookies.get('rol')=='ADMINISTRADOR'? <DropdownItem>Setting</DropdownItem>:''}
                                         <DropdownItem>Help</DropdownItem>
                                         <DropdownItem divider />
                                         <DropdownItem onClick={()=>{this.cerrar_session()}}> Log Out</DropdownItem>
