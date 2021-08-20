@@ -60,7 +60,7 @@ export default class Navigation extends Component {
                             <ul className=" navbar-nav">
                             
                                 <li className="nav-item active">
-                                    <Link className="nav-link text-white" to="/home">Homeee</Link>
+                                    <Link className="nav-link text-white" to="/home">Home</Link>
                                 </li>
                                 
                                 {cookies.get('rol')=='ADMINISTRADOR'?
