@@ -79,7 +79,7 @@ class Evaluacion extends Component {
 
                 }).then((value) => {
                     if (value) {
-                        window.location.href = `${REACT_APP_DIREC}/home`;
+                        window.location.href = `/`;
 //                       window.location.href=`${REACT_APP_DIREC}/presentacion/`+id_taller;
                     }
                 })
@@ -303,7 +303,7 @@ class Evaluacion extends Component {
                     closeOnEsc: false
                 }).then((value) => {
                     if (value) {
-                        window.location.href = `${REACT_APP_DIREC}/home`;
+                        window.location.href = `/`;
 //                       window.location.href=`${REACT_APP_DIREC}/presentacion/`+id_taller;
                     }
                 })
