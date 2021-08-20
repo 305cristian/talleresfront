@@ -47,13 +47,19 @@ export default class Navigation extends Component {
         cookies.remove('image', {path: '/'});
         window.location.href = '/';
     }
+    
+   hidden(){
+      const menu =document.querySelector('#navbarNav');
+      menu.classList.toggle('show')
+
+  }
 
     render() {
         return(
                 <div>
                     <nav className="navbar navbar-expand-lg navbar-light bg-dark">
                         <Link className="navbar-brand text-white" to="/home"><FontAwesomeIcon icon={faFeatherAlt}/> TALLERES BY CC</Link>
-                        <button className="navbar-toggler bg-white" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <button id="btn" className="navbar-toggler bg-white" type="button" onClick={()=>{this.hidden()}} data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon"></span>
                         </button>
                         <div className=" collapse navbar-collapse" id="navbarNav">
