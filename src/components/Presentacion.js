@@ -15,7 +15,7 @@ const cookies = new Cookies();
 //import Styles from '../index.css'
 
 
-const{REACT_APP_HOST} = process.env;
+const{REACT_APP_HOST, REACT_APP_PATCH_VID} = process.env;
 
 const styles = {
     border: {
@@ -75,7 +75,7 @@ function Presentacion() {
                                 <Col xs={9}>
                     
                                 <ReactPlayer
-                                    url={`${REACT_APP_HOST}/public_video/${taller.video}`}   
+                                    url={`${REACT_APP_PATCH_VID}videostaller%2F${taller.video}?alt=media`}   
                                     controls
                                     width='100%'
                                     height='100%'    

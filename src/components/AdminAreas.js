@@ -9,12 +9,13 @@ import Styles from '../index.css'
 import Navigation from '../components/Navigation';
 import Breadcrumb_nav from '../components/Breadcrumb_nav';
 import Cookies from 'universal-cookie';
-
+import firebase from '../../src/setting/server_firebase';
 
 
 const cookies = new Cookies();
 
 const {REACT_APP_HOST} = process.env;
+var storage = firebase.app().storage("gs://talleres-1b6d0.appspot.com");
 
 const validation = data => {
     const errors = {};
@@ -37,7 +38,8 @@ class AdminAreas extends Component {
             textButton: 'REGISTRAR',
             header: 'Insertar Area',
             modalOpen: false,
-            image: null,
+            img_temp:'',
+            image: '',
             errors: {}
 
         }
@@ -71,9 +73,11 @@ class AdminAreas extends Component {
             let datos = new FormData();
             datos.append('title', this.state.title);
             datos.append('description', this.state.description);
-            datos.append('image', this.state.image);
+            datos.append('image', this.state.image.name);
             if (this.state._id) {
-                axios.put(`${REACT_APP_HOST}/api/areas/` + this.state._id, datos).then((response) => {
+                axios.put(`${REACT_APP_HOST}/api/areas/` + this.state._id, datos).then(async(response) => {
+                    let eliminar = await this.deleteImage();
+                    let cargar = await this.uploadImage();
                     Swal({
                         title: 'Tarea Actualizada',
                         icon: 'success',
@@ -84,7 +88,8 @@ class AdminAreas extends Component {
                     this.setState({title: '', description: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: null, errors: {}});
                 })
             } else {
-                axios.post(`${REACT_APP_HOST}/api/areas`, datos).then((response) => {
+                axios.post(`${REACT_APP_HOST}/api/areas`, datos).then(async(response) => {
+                    let cargar = await this.uploadImage();
                     Swal({
                         title: 'Area registrada',
                         icon: 'success',
@@ -105,6 +110,7 @@ class AdminAreas extends Component {
                 title: response.data.title,
                 description: response.data.description,
                 image: response.data.image,
+                img_temp: response.data.image,
                 _id: response.data._id,
                 textButton: 'ACTUALIZAR',
                 header: 'Actualizar Area',
@@ -113,7 +119,8 @@ class AdminAreas extends Component {
         })
     }
 
-    deleteArea(id) {
+    deleteArea(id, image) {
+         this.setState({img_temp:image});
         Swal({
             title: 'Esta seguro de eliminar el Area',
             text: ' El area se eliminara definitivamente',
@@ -122,8 +129,9 @@ class AdminAreas extends Component {
             dangerMode: true
         }).then((value) => {
             if (value) {
-                axios.delete(`${REACT_APP_HOST}/api/areas/` + id).then((response) => {
+                axios.delete(`${REACT_APP_HOST}/api/areas/` + id).then(async(response) => {
                     console.log(response.data);
+                     let eliminar = await this.deleteImage();
                     Swal({
                         title: 'Area eliminada',
                         icon: 'success',
@@ -148,11 +156,27 @@ class AdminAreas extends Component {
         this.setState({[name]: value});
         console.log(e.target.value);
     }
+    
+     uploadImage = async() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imgareas/${this.state.image.name}`);
+        return await spaceRef.put(this.state.image)
+
+    }
+    deleteImage = async() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imgareas/${this.state.img_temp}`);
+        return await  spaceRef.delete();
+
+    }
+
 
     handleImageUpload = (e) => {
         this.setState({image: e.target.files[0]});
         console.log(e.target.files[0]);
     }
+    
+    
 
     render() {
 
@@ -190,7 +214,7 @@ class AdminAreas extends Component {
                                                                                                     }}>Edit</Button>{' '}
                                                 
                                                                         <Button color="danger" onClick={ () => {
-                                                                                                this.deleteArea(data._id)
+                                                                                                this.deleteArea(data._id,data.image)
                                                                                                     }}>Delete</Button>
                                                                     </td>
                                                                 </tr>

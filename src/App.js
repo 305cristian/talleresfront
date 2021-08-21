@@ -24,11 +24,11 @@ import Footer from './components/Footer'
         return (
                 <BrowserRouter>   
                 
-                   <Switch>                  
+                    <Switch>                  
                     <Route path="/listTalleres/:id_ar" component={ListTalleres}/>
-                    <Route path="/adminTask" component={AdminTalleres}/>
                     <Route path="/adminAreas" component={AdminAreas}/>
                     <Route path="/presentacion/:id" component={Presentacion}/>
+                    <Route path="/adminTask" component={AdminTalleres}/>    
                     <Route path="/culminado/:id/:fecha" component={Culminado}/>
                     <Route path="/adminUsers/" component={AdminUsers}/>
                     <Route path="/adminResultados/" component={AdminResultados}/>
@@ -36,8 +36,8 @@ import Footer from './components/Footer'
                     <Route path="/home" component={ListAreas}/>
                     <Route path="/" render={() => <Login name="Login" />}/>
                     </Switch>
-                                    <Footer/>
-
+                    <Footer/>
+                
                 </BrowserRouter>
 
                 )

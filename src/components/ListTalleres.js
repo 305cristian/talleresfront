@@ -16,7 +16,7 @@ import Cookies from 'universal-cookie';
 
 
 const cookies = new Cookies();
-const{REACT_APP_HOST} = process.env;
+const{REACT_APP_HOST, REACT_APP_PATCH} = process.env;
 
 const styles = {
     div: {
@@ -123,7 +123,7 @@ class ListTalleres extends Component {
                                                                                                     <div className="text-right"><span className="badge bg-success text-white text-right">Completado <FontAwesomeIcon icon={faCheckCircle}/></span></div>
                                                                                                 </CardHeader>
                                                                                                 <CardBody className="text-center">
-                                                                                                    <CardImg className="image" top width="100%" src={`${REACT_APP_HOST}/public_image/${taller.image}`} alt="Card image cap" /> 
+                                                                                                    <CardImg className="image" top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
                                                                                                     <CardText>{taller.description}</CardText>
                                                                                 
                                                                                                 </CardBody>
@@ -137,7 +137,7 @@ class ListTalleres extends Component {
                                                                                                     <div className="text-right"><span className="badge bg-warning text-white text-right">En Curso <FontAwesomeIcon icon={faExclamationCircle}/></span></div>
                                                                                                 </CardHeader>
                                                                                                 <CardBody className="text-center">
-                                                                                                    <CardImg className="image" top width="100%" src={`${REACT_APP_HOST}/public_image/${taller.image}`} alt="Card image cap" /> 
+                                                                                                    <CardImg className="image" top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
                                                                                                     <CardText>{taller.description}</CardText>
                                                                                 
                                                                                                 </CardBody>

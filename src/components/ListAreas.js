@@ -13,7 +13,7 @@ import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
 //import env from "react-dotenv";
-const{REACT_APP_HOST} = process.env;
+const{REACT_APP_HOST, REACT_APP_PATCH} = process.env;
 
 const styles = {
     div: {
@@ -67,7 +67,7 @@ export default class ListAreas extends Component {
                                                         </CardHeader>
                                         
                                                         <CardBody className="text-center">
-                                                            <CardImg className="image" top width="100%" src={`${REACT_APP_HOST}/public_image_area/${area.image}`} alt="Card image cap" /> 
+                                                            <CardImg className="image" top width="100%" src={`${REACT_APP_PATCH}imgareas%2F${area.image}?alt=media`} alt="Card image cap" /> 
                                                             <CardText>{area.description}</CardText>
                                                             
                                                         </CardBody>

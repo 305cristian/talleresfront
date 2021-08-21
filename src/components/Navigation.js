@@ -8,7 +8,7 @@ import {Modal, Button, Dropdown, DropdownToggle, DropdownMenu, DropdownItem}from
 
 
 const cookies = new Cookies();
-const {REACT_APP_HOST} = process.env;
+const {REACT_APP_HOST,REACT_APP_PATCH} = process.env;
 
 export default class Navigation extends Component {
 
@@ -100,7 +100,7 @@ export default class Navigation extends Component {
                                        }}>Soporte</a> 
                                        
                                 {cookies.get('image')!=='...' ?
-                                    <img className='border p-1 mr-1' width='35' height='38' src={`${REACT_APP_HOST}/public_image_user/` + cookies.get('image')} alt='Image'/>
+                                    <img className='border p-1 mr-1' width='35' height='38' src={`${REACT_APP_PATCH}imguser%2F` + cookies.get('image')+'?alt=media'} alt='Image'/>
                                             :
                                     <FontAwesomeIcon icon={faUserTie}  style={{fontSize: 30}}/>
                                 }

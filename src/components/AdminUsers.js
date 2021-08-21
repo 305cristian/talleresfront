@@ -11,11 +11,15 @@ import Navigation from '../components/Navigation';
 import Breadcrumb_nav from '../components/Breadcrumb_nav';
 import Cookies from 'universal-cookie';
 
+import firebase from '../../src/setting/server_firebase';
+
 
 
 const cookies = new Cookies();
 
 const {REACT_APP_HOST} = process.env;
+
+var storage = firebase.app().storage("gs://talleres-1b6d0.appspot.com");
 
 const validation = data => {
     const errors = {};
@@ -55,7 +59,8 @@ class AdminUsers extends Component {
             header: 'Insertar Usuario',
             modalOpen: false,
             image: '...',
-            errors: {}
+            errors: {},
+            img_temp: ''
 
         }
 
@@ -89,9 +94,11 @@ class AdminUsers extends Component {
             datos.append('user', this.state.user);
             datos.append('pass', this.state.pass);
             datos.append('rol', this.state.rol);
-            datos.append('image', this.state.image);
+            datos.append('image', this.state.image.name);
             if (this.state._id) {
-                axios.put(`${REACT_APP_HOST}/api/users/` + this.state._id, datos).then((response) => {
+                axios.put(`${REACT_APP_HOST}/api/users/` + this.state._id, datos).then(async(response) => {
+                    let eliminar = await this.deleteImage();
+                    let cargar = await this.uploadImage();
                     Swal({
                         title: 'Usuario Actualizada',
                         icon: 'success',
@@ -99,10 +106,13 @@ class AdminUsers extends Component {
                         button: false
                     });
                     this.getUsers();
-//                    this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '...', errors: {}});
+                    this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '...', errors: {}});
                 })
             } else {
-                axios.post(`${REACT_APP_HOST}/api/users`, datos).then((response) => {
+
+                axios.post(`${REACT_APP_HOST}/api/users`, datos).then(async(response) => {
+                    let cargar = await this.uploadImage();
+                    
                     Swal({
                         title: 'Usuario registrada',
                         icon: 'success',
@@ -110,10 +120,10 @@ class AdminUsers extends Component {
                         button: false
                     });
                     this.getUsers();
-//                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', image: '...'})
+
+                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', image: '...'})
                 })
             }
-            this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '...', errors: {}});
 
         }
 
@@ -130,6 +140,7 @@ class AdminUsers extends Component {
                 pass: response.data.pass,
                 rol: response.data.rol,
                 image: response.data.image,
+                img_temp: response.data.image,
                 _id: response.data._id,
                 textButton: 'ACTUALIZAR',
                 header: 'Actualizar Usuario'
@@ -138,7 +149,8 @@ class AdminUsers extends Component {
         })
     }
 
-    deleteUser(id) {
+    deleteUser(id, image) {
+        this.setState({img_temp:image});
         Swal({
             title: 'Esta seguro de eliminar el Usuario',
             text: ' El usuario se eliminara definitivamente',
@@ -147,8 +159,9 @@ class AdminUsers extends Component {
             dangerMode: true
         }).then((value) => {
             if (value) {
-                axios.delete(`${REACT_APP_HOST}/api/users/` + id).then((response) => {
+                axios.delete(`${REACT_APP_HOST}/api/users/` + id).then(async(response) => {
                     console.log(response.data);
+                    let eliminar = await this.deleteImage();
                     Swal({
                         title: 'Usuario eliminada',
                         icon: 'success',
@@ -174,7 +187,21 @@ class AdminUsers extends Component {
         console.log(e.target.value);
     }
 
+    uploadImage = async() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imguser/${this.state.image.name}`);
+        return await spaceRef.put(this.state.image)
+
+    }
+    deleteImage = async() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imguser/${this.state.img_temp}`);
+        return await  spaceRef.delete();
+
+    }
+
     handleImageUpload = (e) => {
+
         this.setState({image: e.target.files[0]});
         console.log(e.target.files[0]);
     }
@@ -201,36 +228,37 @@ class AdminUsers extends Component {
                                                 <th>USUARIO</th>
                                                 <th>ROL</th>
                                                 <th>IMAGE</th>
+                                                <th>ACCIONES</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {
-                                                        this.state.users.map(data => {
-                                                            return(
-                                                                <tr key={data._id}>
-                                                                    <td>{data.nombre}</td>
-                                                                    <td>{data.apellido}</td>
-                                                                    <td>{data.cedula}</td>
-                                                                    <td>{data.user}</td>
-                                                                    <td>{data.rol}</td>
-                                                                    <td>{data.image}</td>
-                                                                    <td>
-                                                                        <Button color="warning" onClick={() => {
-                                                                                                this.showModal();
-                                                                                                this.editUser(data._id);
-                                                                                                    }}>Edit</Button>{' '}
-                                                
-                                                                        <Button color="danger" onClick={ () => {
-                                                                                                this.deleteUser(data._id)
-                                                                                                    }}>Delete</Button>
-                                                                    </td>
-                                                                </tr>
-                                                                    )
-                                                        })
+                                        this.state.users.map(data => {
+                                            return(
+                                                                                <tr key={data._id}>
+                                                                                    <td>{data.nombre}</td>
+                                                                                    <td>{data.apellido}</td>
+                                                                                    <td>{data.cedula}</td>
+                                                                                    <td>{data.user}</td>
+                                                                                    <td>{data.rol}</td>
+                                                                                    <td>{data.image}</td>
+                                                                                    <td>
+                                                                                        <Button color="warning" onClick={() => {
+                                                                                        this.showModal();
+                                                                                        this.editUser(data._id);
+                                                                                                            }}>Edit</Button>{' '}
+                                                                
+                                                                                        <Button color="danger" onClick={ () => {
+                                                                                        this.deleteUser(data._id, data.image)
+                                                                                    }}>Delete</Button>
+                                                                                    </td>
+                                                                                </tr>
+                                                    )
+                                        })
                                             }
                                         </tbody>
                                     </Table>
-                                    : <h1>No hay Usuarios registrados</h1>}
+                            : <h1>No hay Usuarios registrados</h1>}
                         <Modal isOpen={this.state.modalOpen}>
                             <ModalHeader>
                                 <div><h3>{this.state.header}</h3></div>

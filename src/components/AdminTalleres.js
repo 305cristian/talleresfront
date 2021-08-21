@@ -13,6 +13,8 @@ import Breadcrumb_nav from '../components/Breadcrumb_nav';
 
 import Cookies from 'universal-cookie';
 
+import firebase from '../../src/setting/server_firebase';
+
 
 
 const cookies = new Cookies();
@@ -36,7 +38,11 @@ const validation = data => {
 }
 //Para pintar boton Prueba
 var prueba_regis = [];
-var array=[];
+var array = [];
+
+var storage = firebase.app().storage("gs://talleres-1b6d0.appspot.com");
+
+
 class AdminTalleres extends Component {
     constructor(props) {
         super(props);
@@ -52,10 +58,13 @@ class AdminTalleres extends Component {
             modalOpen: false,
             modalEval: false,
             videoload: false,
-            image: null,
+            image: '',
+            img_temp: '',
             video: '...',
+            video_temp: '',
             tiempo: '30',
             intentos: '1',
+            evaluacion:'0',
             errors: {},
 
             //modal eval
@@ -77,6 +86,10 @@ class AdminTalleres extends Component {
             btnCreaResp: 'Crear',
             respuestas_preg: [],
             _idresp: '',
+
+            //
+            aux: '',
+            aux_v: ''
 
         };
 //        this.fileInput = React.createRef();
@@ -129,11 +142,42 @@ class AdminTalleres extends Component {
             datos.append('description', this.state.description);
             datos.append('tiempo', this.state.tiempo);
             datos.append('intentos', this.state.intentos);
-            datos.append('image', this.state.image);
-            datos.append('video', this.state.video);
+            datos.append('evaluacion', this.state.evaluacion);
+            
+
+            if (this.state._id && this.state.aux==='') {
+                console.log('modifico');
+                datos.append('image', this.state.image);
+            } else if(this.state._id && this.state.aux.name) {
+                 console.log('modifico imagen');
+                datos.append('image', this.state.image.name);
+            }else{
+                 console.log('guardo');
+                datos.append('image', this.state.image.name); 
+            }
+            
+            if (this.state._id && this.state.aux_v==='') {
+                console.log('modifico');
+                datos.append('video', this.state.video);
+            } else if(this.state._id && this.state.aux_v.name) {
+                 console.log('modifico video');
+               datos.append('video', this.state.video.name);
+            }else{
+                 datos.append('video', this.state.video);
+            }
+
+
+            
             if (this.state._id) {
-                axios.put(`${REACT_APP_HOST}/api/talleres/` + this.state._id, datos).then((data) => {
-//                axios.put('http://localhost:4000/api/talleres/' + this.state._id, datos).then((data) => {
+                if (this.state.aux.name) {
+                    this.deleteImage2();
+                    this.uploadImage2();
+                }
+                if (this.state.aux_v.name) {                   
+                      this.deleteVideo2();  
+                    this.uploadVideo2();
+                }
+                axios.put(`${REACT_APP_HOST}/api/talleres/` + this.state._id, datos).then(async(data) => {
                     console.log(data);
                     Swal({
                         title: 'Tarea Actualizada',
@@ -143,12 +187,12 @@ class AdminTalleres extends Component {
                         button: false
                     });
                     this.getTalleres();
-                    this.setState({title: '', description: '', tiempo: '30', intentos: '1', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: null, errors: {}});
+                    this.setState({title: '', description: '', tiempo: '30', intentos: '1', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '', aux:'',aux_v:'',errors: {}});
                 }).catch(err => console.error(err));
             } else {
-                axios.post(`${REACT_APP_HOST}/api/talleres`, datos).then((data) => {
-//                axios.post('http://localhost:4000/api/talleres', datos).then((data) => {
+                axios.post(`${REACT_APP_HOST}/api/talleres`, datos).then(async(data) => {
                     console.log(data);
+                    let cargarimg = await this.uploadImage();
                     Swal({
                         title: 'Tarea Registrada',
                         text: 'ok',
@@ -157,13 +201,15 @@ class AdminTalleres extends Component {
                         button: false
                     });
                     this.getTalleres()
-                    this.setState({title: '', description: '', tiempo: '30', intentos: '1', image: null});
+                    this.setState({title: '', description: '', tiempo: '30', intentos: '1', image: '', aux:'', aux_v:''});
                 })
                         .catch(err => console.error(err));
             }
         }
     }
-    deleteTaller(id) {
+    deleteTaller(id, image, video) {
+        this.setState({img_temp: image});
+        this.setState({video_temp: video});
         Swal({
             title: 'Esta seguro de eliminar la tarea',
             text: ' La tarea se eliminara definitivamente',
@@ -172,9 +218,13 @@ class AdminTalleres extends Component {
             dangerMode: true
         }).then((value) => {
             if (value) {
-                axios.delete(`${REACT_APP_HOST}/api/talleres/` + id).then((response) => {
+                axios.delete(`${REACT_APP_HOST}/api/talleres/` + id).then(async(response) => {
 //                axios.delete('http://localhost:4000/api/talleres/' + id).then((response) => {
                     console.log(response.data);
+                    let eliminarimg = await this.deleteImage();
+                    if (video !== '...') {
+                        let eliminarvideo = await this.deleteVideo();
+                    }
                     Swal({
                         title: 'Tarea eliminada',
                         icon: 'success',
@@ -195,17 +245,20 @@ class AdminTalleres extends Component {
                 description: response.data.description,
                 tiempo: response.data.tiempo,
                 intentos: response.data.intentos,
+                evaluacion: response.data.evaluacion,
                 area_id: response.data.area_id,
                 image: response.data.image,
+                img_temp: response.data.image,
                 video: response.data.video,
+                video_temp: response.data.video,
                 _id: response.data._id,
                 textButton: 'ACTUALIZAR',
                 header: 'Actualizar Tarea',
                 videoload: true,
 
             });
-            console.log(this.state.image)
-            console.log(this.state.video)
+            console.log(this.state.image);
+            console.log(this.state.video);
         })
     }
     hideModal() {
@@ -241,14 +294,66 @@ class AdminTalleres extends Component {
         this.setState({[name]: value}, () => this.getRespuestas());
     }
 
+    uploadImage = async() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imgtaller/${this.state.image.name}`);
+        return await spaceRef.put(this.state.image);
+
+    }
+    uploadImage2 = () => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imgtaller/${this.state.image.name}`);
+        return spaceRef.put(this.state.image);
+
+    }
+    deleteImage = async() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imgtaller/${this.state.img_temp}`);
+        return await  spaceRef.delete();
+
+    }
+    deleteImage2 = () => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imgtaller/${this.state.img_temp}`);
+        return  spaceRef.delete();
+
+    }
+    uploadVideo2 =() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`videos/videostaller/${this.state.video.name}`);
+        return spaceRef.put(this.state.video)
+
+    }
+    uploadVideo = async() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`videos/videostaller/${this.state.video.name}`);
+        return await spaceRef.put(this.state.video)
+
+    }
+    deleteVideo2 = () => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`videos/videostaller/${this.state.video_temp}`);
+        if(this.state.video_temp!=='...'){
+           return  spaceRef.delete();  
+        }
+       
+
+    }
+    deleteVideo = async() => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`videos/videostaller/${this.state.video_temp}`);
+        return await  spaceRef.delete();
+
+    }
+
     handleImageUpload = (e) => {
         console.log(e.target.files[0]);
-        this.setState({image: e.target.files[0]});
+        this.setState({image: e.target.files[0], aux: e.target.files[0]});
         console.log(this.state.image)
     }
     handleVideoUpload = (e) => {
         console.log(e.target.files[0]);
-        this.setState({video: e.target.files[0]});
+        this.setState({video: e.target.files[0], aux_v:e.target.files[0]});
         console.log(this.state.video)
     }
 
@@ -383,7 +488,7 @@ class AdminTalleres extends Component {
         }
         ).then((value) => {
             if (value) {
-                axios.delete(`${REACT_APP_HOST}/api/preguntas/` + id_preg).then((response) => {
+                axios.delete(`${REACT_APP_HOST}/api/preguntas/` + id_preg+'/'+this.state.taller_id).then((response) => {
                     if (response.data) {
                         Swal({
                             title: 'Pregunta eliminada exitosamente',
@@ -492,22 +597,9 @@ class AdminTalleres extends Component {
         })
     }
 
-      prueba_isset(id) {//Este metodo es para pintar el boton de evaluacion
-        axios.get(`${REACT_APP_HOST}/api/preguntas/` + id).then((response) => {
-                if (response.data.length > 0) {
-                    array.push('1');
-                } else {
-                    array.push('0');
-                }
-            return response.data;
-
-        })
-        return array;
-
-    }
-
+  
     render() {
-        
+
         const {errors} = this.state;
         return (
                 <div>
@@ -525,12 +617,12 @@ class AdminTalleres extends Component {
                                                 <th>TALLER</th>
                                                 <th>DESCRIPCION</th>
                                                 <th><FontAwesomeIcon icon={faClock}/></th>
-                                        <th><FontAwesomeIcon icon={faRedo}/></th>
-                                        <th>IMG_DIR</th>
-                                        <th>VD_DIR</th>
-                                        <th>EVALUAR</th>
-                                        <th>ACCIONES</th>
-                                        </tr>
+                                                <th><FontAwesomeIcon icon={faRedo}/></th>
+                                                <th>IMG_DIR</th>
+                                                <th>VD_DIR</th>
+                                                <th>EVALUAR</th>
+                                                <th>ACCIONES</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
                                             {
@@ -544,11 +636,17 @@ class AdminTalleres extends Component {
                                                                                     <td>{data.intentos}</td>                                                                   
                                                                                     <td>{data.image}</td>
                                                                                     <td>{data.video}</td>
-                                                                                    {this.prueba_isset(data._id)}
+                                                                                    
+                                                                                    {data.evaluacion === '0' ?
                                                                                     <td> <Button color="info" size="sm" onClick={() => {
                                                                                         this.showModalEval(data._id)
-                                                                                                            }}>{prueba_regis[index] === '1' ? <span>Editar <FontAwesomeIcon icon={faFileAlt}/></span> : <span>Crear <FontAwesomeIcon icon={faFileAlt}/></span>}</Button></td>
-                                                                
+                                                                                                            }}><span>Crear <FontAwesomeIcon icon={faFileAlt}/></span></Button>
+                                                                                    </td>
+                                                                                    :<td> <Button color="success" size="sm" onClick={() => {
+                                                                                        this.showModalEval(data._id)
+                                                                                                            }}><span>Editar <FontAwesomeIcon icon={faCheckCircle}/></span></Button>
+                                                                                    </td>
+                                                                                    }
                                                                                     <td>
                                                                                         <Button color="warning" onClick={() => {
                                                                                         this.showModal();
@@ -556,7 +654,7 @@ class AdminTalleres extends Component {
                                                                                                             }} size="sm"><FontAwesomeIcon icon={faEdit}/></Button>{' '}
                                                                 
                                                                                         <Button color="danger" onClick={ () => {
-                                                                                        this.deleteTaller(data._id)
+                                                                                        this.deleteTaller(data._id, data.image, data.video)
                                                                                                             }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
                                                                                     </td>
                                                                                 </tr>

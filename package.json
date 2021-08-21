@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^12.6.3",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "firebase": "^8.10.0",
     "html-react-parser": "^1.2.6",
     "md5": "^2.3.0",
     "react": "^17.0.1",
