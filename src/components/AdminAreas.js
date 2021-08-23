@@ -40,6 +40,7 @@ class AdminAreas extends Component {
             modalOpen: false,
             img_temp:'',
             image: '',
+            aux:'',
             errors: {}
 
         }
@@ -73,11 +74,28 @@ class AdminAreas extends Component {
             let datos = new FormData();
             datos.append('title', this.state.title);
             datos.append('description', this.state.description);
-            datos.append('image', this.state.image.name);
+//            datos.append('image', this.state.image.name);
+            
+            if (this.state._id && this.state.aux==='') {
+                console.log('modifico');
+                datos.append('image', this.state.image);
+            } else if(this.state._id && this.state.aux.name) {
+                 console.log('modifico imagen');
+                datos.append('image', this.state.image.name);
+            }else{
+                 console.log('guardo');
+                datos.append('image', this.state.image.name); 
+            }
+            
             if (this.state._id) {
+                
+                if (this.state.aux.name) {
+                    this.deleteImage2();
+                    this.uploadImage2();
+                }
+                
                 axios.put(`${REACT_APP_HOST}/api/areas/` + this.state._id, datos).then(async(response) => {
-                    let eliminar = await this.deleteImage();
-                    let cargar = await this.uploadImage();
+                  
                     Swal({
                         title: 'Tarea Actualizada',
                         icon: 'success',
@@ -85,7 +103,7 @@ class AdminAreas extends Component {
                         button: false
                     });
                     this.getAreas();
-                    this.setState({title: '', description: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: null, errors: {}});
+                    this.setState({title: '', description: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: null,aux:'', errors: {}});
                 })
             } else {
                 axios.post(`${REACT_APP_HOST}/api/areas`, datos).then(async(response) => {
@@ -97,7 +115,7 @@ class AdminAreas extends Component {
                         button: false
                     });
                     this.getAreas();
-                    this.setState({title: '', description: '', image: null})
+                    this.setState({title: '', description: '',aux:'', image: null})
                 })
             }
         }
@@ -169,10 +187,23 @@ class AdminAreas extends Component {
         return await  spaceRef.delete();
 
     }
+    
+      uploadImage2 = () => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imgareas/${this.state.image.name}`);
+        return spaceRef.put(this.state.image);
+
+    }
+    deleteImage2 = () => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imgareas/${this.state.img_temp}`);
+        return  spaceRef.delete();
+
+    }
 
 
     handleImageUpload = (e) => {
-        this.setState({image: e.target.files[0]});
+        this.setState({image: e.target.files[0],aux: e.target.files[0]});
         console.log(e.target.files[0]);
     }
     

@@ -60,7 +60,8 @@ class AdminUsers extends Component {
             modalOpen: false,
             image: '...',
             errors: {},
-            img_temp: ''
+            img_temp: '',
+            aux:''
 
         }
 
@@ -94,11 +95,29 @@ class AdminUsers extends Component {
             datos.append('user', this.state.user);
             datos.append('pass', this.state.pass);
             datos.append('rol', this.state.rol);
-            datos.append('image', this.state.image.name);
+//            datos.append('image', this.state.image.name);
+            
+             if (this.state._id && this.state.aux==='') {
+                console.log('modifico');
+                datos.append('image', this.state.image);
+            } else if(this.state._id && this.state.aux.name) {
+                 console.log('modifico imagen');
+                datos.append('image', this.state.image.name);
+            }else{
+                 console.log('guardo');
+                datos.append('image', this.state.image.name); 
+            }
+            
             if (this.state._id) {
+                
+                 if (this.state.aux.name) {
+                    this.deleteImage2();
+                    this.uploadImage2();
+                }
+                
                 axios.put(`${REACT_APP_HOST}/api/users/` + this.state._id, datos).then(async(response) => {
-                    let eliminar = await this.deleteImage();
-                    let cargar = await this.uploadImage();
+//                    let eliminar = await this.deleteImage();
+//                    let cargar = await this.uploadImage();
                     Swal({
                         title: 'Usuario Actualizada',
                         icon: 'success',
@@ -106,7 +125,7 @@ class AdminUsers extends Component {
                         button: false
                     });
                     this.getUsers();
-                    this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '...', errors: {}});
+                    this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', _id: '', textButton: 'REGISTRAR', modalOpen: false,aux:'', image: '...', errors: {}});
                 })
             } else {
 
@@ -121,7 +140,7 @@ class AdminUsers extends Component {
                     });
                     this.getUsers();
 
-                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', image: '...'})
+                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', aux:'',image: '...'})
                 })
             }
 
@@ -199,10 +218,23 @@ class AdminUsers extends Component {
         return await  spaceRef.delete();
 
     }
+    
+     uploadImage2 = () => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imguser/${this.state.image.name}`);
+        return spaceRef.put(this.state.image);
+
+    }
+    deleteImage2 = () => {
+        var storageRef = storage.ref();
+        var spaceRef = storageRef.child(`images/imguser/${this.state.img_temp}`);
+        return  spaceRef.delete();
+
+    }
 
     handleImageUpload = (e) => {
 
-        this.setState({image: e.target.files[0]});
+        this.setState({image: e.target.files[0], aux:e.target.files[0]});
         console.log(e.target.files[0]);
     }
 
