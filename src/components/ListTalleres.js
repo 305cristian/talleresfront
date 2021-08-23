@@ -6,7 +6,7 @@ import axios from 'axios';
 import{Link, useParams} from'react-router-dom';
 
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import {faCheckCircle, faExclamationCircle}from '@fortawesome/free-solid-svg-icons'
+import {faCheckCircle, faExclamationCircle, faExclamationTriangle}from '@fortawesome/free-solid-svg-icons'
 
 import Navigation from '../components/Navigation';
 import Breadcrumb_nav from '../components/Breadcrumb_nav';
@@ -106,12 +106,12 @@ class ListTalleres extends Component {
     render() {
 
         return (
-                <div>
+                <div className="container-fluid">
                     <Navigation />
-                    <Container>
+                      <div className="containerFluid2 mt-2 p-5 ">
                 
                         {this.state.talleres.length > 0 ?
-                                    <div className="row my-5">
+                                    <div className="row">
                                         {
                                                     this.state.talleres_validados.map((taller, index) => (
                                                                 <div className="col-md-3" key={taller._id} style={styles.div}>
@@ -119,8 +119,14 @@ class ListTalleres extends Component {
                                                                                                 <Link to={`/culminado/${taller._id}/${taller.fecha}`} style={{color: "black", textDecoration: "none black"}}>
                                                                                                 <Card className="card_taller">
                                                                                                 <CardHeader>
-                                                                                                    <CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle>
-                                                                                                    <div className="text-right"><span className="badge bg-success text-white text-right">Completado <FontAwesomeIcon icon={faCheckCircle}/></span></div>
+                                                                                                <div className="row col-md-12">
+                                                                                                    <div className="col-md-9">
+                                                                                                        <CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle>
+                                                                                                    </div>
+                                                                                                    <div className="col-md-2">
+                                                                                                       <span className="badge bg-success text-white text-right">Completado <FontAwesomeIcon icon={faCheckCircle}/></span>
+                                                                                                    </div>
+                                                                                                </div>
                                                                                                 </CardHeader>
                                                                                                 <CardBody className="text-center">
                                                                                                     <CardImg className="image" top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
@@ -133,8 +139,14 @@ class ListTalleres extends Component {
                                                                                                 <Link to={`/presentacion/${taller._id}`} style={{color: "black", textDecoration: "none black"}}>
                                                                                                 <Card className="card_taller">
                                                                                                 <CardHeader>
-                                                                                                    <CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle>
-                                                                                                    <div className="text-right"><span className="badge bg-warning text-white text-right">En Curso <FontAwesomeIcon icon={faExclamationCircle}/></span></div>
+                                                                                                <div className="row col-md-12">
+                                                                                                    <div className="col-md-9">
+                                                                                                        <CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle>
+                                                                                                    </div>
+                                                                                                    <div className="col-md-2">
+                                                                                                        <span className="badge bg-warning text-white text-right">En Curso <FontAwesomeIcon icon={faExclamationCircle}/></span>
+                                                                                                    </div>
+                                                                                                </div>
                                                                                                 </CardHeader>
                                                                                                 <CardBody className="text-center">
                                                                                                     <CardImg className="image" top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
@@ -153,9 +165,10 @@ class ListTalleres extends Component {
                             
                                     </div>
 
-                                    : <h5>No hay talleres registrados en esta area</h5>}
-                    </Container>
+                                    : <h5 className="text-warning">! Atencion, No hay talleres registrados en esta area <FontAwesomeIcon icon={faExclamationTriangle}/></h5>}
+                    </div>
                 
+           
                 </div>
                 )
     }

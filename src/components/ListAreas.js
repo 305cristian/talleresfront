@@ -8,7 +8,8 @@ import Navigation from '../components/Navigation';
 import Breadcrumb_nav from '../components/Breadcrumb_nav';
 
 import Cookies from 'universal-cookie';
-
+import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
+import {faChartPie, faStepBackward,faLayerGroup}from '@fortawesome/free-solid-svg-icons'
 
 
 const cookies = new Cookies();
@@ -52,10 +53,11 @@ export default class ListAreas extends Component {
 
 
         return (
-                <div>
+                <div className="container-fluid">
                  <Navigation />
-                <Container>
-                    <div className="row my-5">
+                <div className="containerFluid2 mt-2 p-5 ">
+                    <div className="row">
+                    <div className="row col-md-9">
                 
                         {
                     this.state.areas.map((area) => (
@@ -63,7 +65,14 @@ export default class ListAreas extends Component {
                                                     <Link to={`/listTalleres/${area._id}`} style={{color: "black", textDecoration: "none black"}}>
                                                         <Card className="card_taller">
                                                         <CardHeader>
-                                                            <CardTitle className="font-weight-bold" tag="h5">{area.title}</CardTitle>
+                                                        <div  className="row  pl-2">
+                                                            <div className="  col-md-10">
+                                                                <CardTitle className="font-weight-bold" tag="h5">{area.title} </CardTitle>
+                                                            </div>
+                                                            <div className=" col-md-2">
+                                                              <span style={{fontSize: 20, color:'#6c757d'}}><FontAwesomeIcon icon={faLayerGroup}/></span>
+                                                            </div>
+                                                        </div>
                                                         </CardHeader>
                                         
                                                         <CardBody className="text-center">
@@ -80,7 +89,23 @@ export default class ListAreas extends Component {
                 
                 
                     </div>
-                </Container>
+                    <div className="row col-md-3">
+                        <div className="container-fluid pl-4 verticalLine">
+                             <Card className="card_taller">
+                                                        <CardHeader>
+                                                            <CardTitle className="font-weight-bold" tag="h5">Estadistica <FontAwesomeIcon icon={faChartPie}/></CardTitle>
+                                                        </CardHeader>
+                                        
+                                                        <CardBody className="text-center">
+                                                            <CardText>En Construccion</CardText>
+                                                            
+                                                        </CardBody>
+                                                        </Card>
+                        </div>
+                    </div>
+                    </div>
+                 
+                </div>
                 </div>
                 )
     }

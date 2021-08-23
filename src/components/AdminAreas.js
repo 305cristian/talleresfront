@@ -10,7 +10,8 @@ import Navigation from '../components/Navigation';
 import Breadcrumb_nav from '../components/Breadcrumb_nav';
 import Cookies from 'universal-cookie';
 import firebase from '../../src/setting/server_firebase';
-
+import { FontAwesomeIcon }from '@fortawesome/react-fontawesome';
+import {faCheckCircle, faExclamationCircle, faExclamationTriangle}from '@fortawesome/free-solid-svg-icons';
 
 const cookies = new Cookies();
 
@@ -254,7 +255,7 @@ class AdminAreas extends Component {
                                             }
                                         </tbody>
                                     </Table>
-                                    : <h1>No hay Areas registrados</h1>}
+                                    : <h5 className="text-warning">! Atencion, No se encontraron areas registradas <FontAwesomeIcon icon={faExclamationTriangle}/></h5>}
                         <Modal isOpen={this.state.modalOpen}>
                             <ModalHeader>
                                 <div><h3>{this.state.header}</h3></div>

@@ -20,6 +20,14 @@
     width: 90%;
     /*display: flex;*/
 }
+.containerFluid2{
+    position: relative;
+    background: #EDEDEF;
+    align-content: center;
+/*    left: 7%;*/
+    width: 100%;
+    /*display: flex;*/
+}
 .containerList{
     position: relative;
     align-content: center;
@@ -108,4 +116,10 @@ body{
 
 .user-namefont{
     font-size: 12px;
+}
+
+.verticalLine {
+  border-left:  solid #fff;
+  position: relative;
+  left:6%;
 }
