@@ -7,7 +7,7 @@ import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
 import {faChevronCircleRight, faFeatherAlt, faClock}from '@fortawesome/free-solid-svg-icons'
 import 'bootstrap/dist/css/bootstrap.css';
 import Swal from 'sweetalert';
-import '../libraries/back';
+//import '../libraries/back';
 
 import Cookies from 'universal-cookie';
 
@@ -57,7 +57,7 @@ class Evaluacion extends Component {
 
     componentDidMount() {
         if (!cookies.get('nombre')) {
-            window.location.href = '/'
+            window.location.href = `${REACT_APP_DIREC}/home`;
         }
         this.getPreguntasRespuestas();
         interval = setInterval(this.cargarSegundos, 1000);
@@ -79,7 +79,7 @@ class Evaluacion extends Component {
 
                 }).then((value) => {
                     if (value) {
-                        window.location.href = `/`;
+                        window.location.href = `${REACT_APP_DIREC}/home`;
 //                       window.location.href=`${REACT_APP_DIREC}/presentacion/`+id_taller;
                     }
                 })
@@ -303,7 +303,7 @@ class Evaluacion extends Component {
                     closeOnEsc: false
                 }).then((value) => {
                     if (value) {
-                        window.location.href = `/`;
+                        window.location.href = `${REACT_APP_DIREC}/home`;
 //                       window.location.href=`${REACT_APP_DIREC}/presentacion/`+id_taller;
                     }
                 })
@@ -339,7 +339,7 @@ class Evaluacion extends Component {
                         text: `Su puntuacion es de: ${puntuacion}/10, Felicidades`,
                         icon: 'success',
                     }).then((resp) => {
-                        window.location.href = '/home'
+                        window.location.href = `${REACT_APP_DIREC}/home`;
                     });
                 } else {
                     Swal({
@@ -347,7 +347,7 @@ class Evaluacion extends Component {
                         text: `Su puntuacion es de: ${puntuacion}/10, Debe acertar en todas las preguntas para completar la tarea, caso contario debera repetir el taller`,
                         icon: 'warning',
                     }).then((resp) => {
-                        window.location.href = '/home'
+                        window.location.href = `${REACT_APP_DIREC}/home`;
                     });
                 }
 
