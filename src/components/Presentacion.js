@@ -68,7 +68,7 @@ function Presentacion() {
                                 <CardHeader><div className="pl-2"><CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle></div></CardHeader>
                                 <CardBody><div className="pl-2"><CardText>{taller.description}</CardText></div></CardBody>
                                 <div className="pl-2 pb-2 text-center">
-                                    <Link to={`/evaluacion/${id}`}><Button disabled={!value} color="success">Evaluacion</Button></Link>
+                                    <Link to={`/evaluacion/${id}`}target="_blank"><Button disabled={!value} color="success">Evaluacion</Button></Link>
                                 </div>
                                 </Card>
                                 </Col>
