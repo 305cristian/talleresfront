@@ -401,9 +401,12 @@ class Evaluacion extends Component {
                                                 <div>
                                                     <label className="font-weight-bold text-white">Su Puntuación es: <span>{puntuacion}/10</span></label>                
                                                 </div>
+
+                                                {cookies.get('rol')==='ADMINISTRADOR'?
                                                 <div>
                                                     <a className='mano text-white' onClick={this.showModalResp}  style={{fontSize: 13}}>Ver Respuestas</a>              
                                                 </div>
+                                                :''}
                                             </div>
                                 
                                             <div  className=" container text-center p-1 my-2">
