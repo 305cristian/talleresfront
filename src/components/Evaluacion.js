@@ -358,7 +358,7 @@ class Evaluacion extends Component {
 
     render() {
         return(
-                <Container>
+                <Container className="my-5">
                 
                     <div className=' container col-md-10 bg-primary text-white'>
                         <div className="row">
