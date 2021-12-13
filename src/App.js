@@ -12,6 +12,7 @@ import Culminado from './components/Culminado'
 import AdminAreas from './components/AdminAreas'
 import AdminUsers from './components/AdminUsers'
 import AdminResultados from './components/AdminResultados'
+import ResetIntentos from './components/ResetIntentos'
 import Evaluacion from './components/Evaluacion'
 import Login from './components/Login'
 import Footer from './components/Footer'
@@ -32,6 +33,7 @@ import Footer from './components/Footer'
                     <Route path="/culminado/:id/:fecha" component={Culminado}/>
                     <Route path="/adminUsers/" component={AdminUsers}/>
                     <Route path="/adminResultados/" component={AdminResultados}/>
+                    <Route path="/resetIntentos/" component={ResetIntentos}/>
                     <Route path="/evaluacion/:id" component={Evaluacion}/>
                     <Route path="/home" component={ListAreas}/>
                     <Route path="/" render={() => <Login name="Login" />}/>

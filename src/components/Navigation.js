@@ -16,7 +16,8 @@ export default class Navigation extends Component {
         super();
         this.state = {
             modalopen: false,
-            dropdownOpen: false
+            dropdownOpen: false,
+            dropdownOpen_setting: false
         }
     }
 
@@ -29,6 +30,9 @@ export default class Navigation extends Component {
  
     toggle() {
         this.state.dropdownOpen?this.setState({dropdownOpen:false}) :this.setState({dropdownOpen:true})
+    }
+    toggle_setting() {
+        this.state.dropdownOpen_setting?this.setState({dropdownOpen_setting:false}) :this.setState({dropdownOpen_setting:true})
     }
 
     componentDidMount() {
@@ -91,7 +95,18 @@ export default class Navigation extends Component {
                                     <Link className="nav-link text-white" to="/adminResultados">Resultados</Link>
                                 </li>
                                  :''}
-                
+                                {cookies.get('rol')=='ADMINISTRADOR'?
+                                <Dropdown isOpen={this.state.dropdownOpen_setting} toggle={() => {this.toggle_setting()}}>
+                                    <DropdownToggle color='dark' caret >
+                                        <span>Settings</span>
+                                    </DropdownToggle>
+                                    <DropdownMenu>
+                                       <DropdownItem><Link className='text-dark text-decoration-none' to="/resetIntentos">Reset Intentos</Link></DropdownItem>                                        
+                                    </DropdownMenu>
+                                    
+                                </Dropdown>
+                                 :''}
+                                
                             </ul>
                             <ul className="navbar-nav ml-auto">
                                 <FontAwesomeIcon icon={faHeadset} style={{fontSize: 30}}/>
@@ -110,7 +125,7 @@ export default class Navigation extends Component {
                                     <span style={{fontSize:12, color:'white'}}>{cookies.get('nombre')} {cookies.get('apellido')} </span>
                                     </DropdownToggle>
                                     <DropdownMenu>
-                                       {cookies.get('rol')=='ADMINISTRADOR'? <DropdownItem>Setting</DropdownItem>:''}
+                                       {cookies.get('rol')=='ADMINISTRADOR'? <DropdownItem><Link className='text-dark text-decoration-none' to="/resetIntentos">Settings</Link></DropdownItem>:''}
                                         <DropdownItem>Help</DropdownItem>
                                         <DropdownItem divider />
                                         <DropdownItem onClick={()=>{this.cerrar_session()}}> Log Out</DropdownItem>

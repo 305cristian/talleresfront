@@ -36,7 +36,13 @@ var estado_tiempo = true;
 var id_taller = '0';
 
 var intentos = 0;
+var aprobacion = 0;
 var interval = '';
+
+var preguntas_eval=[];
+var respuestas_eval=[];
+var estado_resp_eval=[];
+
 class Evaluacion extends Component {
 
     constructor() {
@@ -116,6 +122,7 @@ class Evaluacion extends Component {
             preguntaAct.taller.map((taller, index) => {
                 minutos = taller.tiempo - 1;
                 intentos = taller.intentos;
+                aprobacion = taller.aprobacion;
 //                this.setState({intentos: taller.intentos, tiempo: taller.tiempo})
             })
         });
@@ -141,8 +148,9 @@ class Evaluacion extends Component {
         const respuestas = document.querySelectorAll('.respuestas');
 
         let estado = true;
-
-        this.state.preguntas_respuestas.map((respuestaAct, indexPreg) => {
+        var estado_resp='';
+        
+        this.state.preguntas_respuestas.map((preg_respAct, indexPreg) => {
             const resp_x_preguntas = respuestas[indexPreg];//agarro todos los input radio de la pregunta
             const checkSelect = `input[name='${indexPreg}']:checked`; //agarro el input radio seleccionado
             const resp_elegida = (resp_x_preguntas.querySelector(checkSelect) || {}).value; // de todas las resp_x_preguntas escogeme el chequeado
@@ -151,10 +159,10 @@ class Evaluacion extends Component {
                 if (resp_elegida === resp_correcta[indexPreg]) {
                     cont_correctas++;
                     sum_pts = this.sumarPuntaje(indexPreg);
-                    this.pintarRespuestas(indexPreg, resp_correcta[indexPreg]);
+                    this.pintarRespuestas(indexPreg, resp_correcta[indexPreg],preg_respAct._id, resp_elegida,estado_resp='1');
                 } else {
                     cont_incorrectas++;
-                    this.pintarRespuestas(indexPreg, resp_correcta[indexPreg]);
+                    this.pintarRespuestas(indexPreg, resp_correcta[indexPreg],preg_respAct._id, resp_elegida, estado_resp='0');
                 }
 
             } else {
@@ -176,17 +184,21 @@ class Evaluacion extends Component {
             window.history.pushState(null, "", "undefinid");
             clearInterval(interval);
 
-
         } else {
+            preguntas_eval=[];//Encero las preguntas del reporte final en caso de que hay respuestas sin seleccionar
+            respuestas_eval=[];//Encero las respuestas del reporte final en caso de que hay respuestas sin seleccionar
+            estado_resp_eval=[]; //Encero el estado de la respuesta del reporte final en caso de que hay respuestas sin seleccionar
+            
             for (var i = 0; i < this.state.preguntas_respuestas.length; i++) {
-                this.despintarRespuestas(i)
+                this.despintarRespuestas(i);
             }
         }
         const acmd = puntaje_list.reduce((a, b) => a + b);
         punt = sum_pts * 10 / acmd;
         puntuacion = Math.round(punt);
 
-//        
+        console.log(preguntas_eval);
+        console.log(respuestas_eval);
     }
 
     sumarPuntaje(index) {
@@ -194,7 +206,13 @@ class Evaluacion extends Component {
         pts += a;
         return pts;
     }
-    pintarRespuestas(indexResp, resp_Correcta) {
+    pintarRespuestas(indexResp, resp_Correcta, id_preg, resp, estado_resp) {
+//        console.log('id_pregunta', id_preg);
+//        console.log('resp', resp);    
+        preguntas_eval.push(id_preg);//Almaceno las preguntas para el reporte de resultados
+        respuestas_eval.push(resp);//Almaceno las respuestas para el reporte de resultados
+        estado_resp_eval.push(estado_resp);//Almaceno el estado de las respuestas 1= si es la respuesta correcta, 2= si es la respuesta incorrecta para el reporte de resultados
+        
         const radios = document.getElementsByName(indexResp);
         for (var i = 0; i < radios.length; i++) {
             var radioCheckeado = radios[i].checked;
@@ -322,28 +340,31 @@ class Evaluacion extends Component {
     }
 
     sendResp(puntuacion) {
+//        console.log('aprobacion con: ', aprobacion)
         var estado = 0;
-        if (puntuacion === 10) {
+        if (puntuacion >= aprobacion) {
             estado = 1;
         }
 
         const id_user = cookies.get('id');
-        const datos = {id_user: id_user, id_taller: id_taller, estado: estado};
+        const ci_user = cookies.get('cedula');
+        const datos = {id_user: id_user, id_taller: id_taller,ci_user:ci_user,puntuacion:puntuacion, estado: estado};
 
         axios.post(`${REACT_APP_HOST}/api/user_taller/`, datos).then((response) => {
             if (response.data) {
 
-                if (puntuacion === 10) {
+                if (puntuacion >= aprobacion) {
+                    this.save_resultados(id_user,ci_user, id_taller, preguntas_eval, respuestas_eval, estado_resp_eval);
                     Swal({
-                        title: 'Tarea Completada',
+                        title: 'Taller Completada',
                         text: `Su puntuacion es de: ${puntuacion}/10, Felicidades`,
-                        icon: 'success',
+                        icon: 'success'
                     }).then((resp) => {
                         window.location.href = `${REACT_APP_DIREC}/home`;
                     });
                 } else {
                     Swal({
-                        title: 'Tarea Registrada',
+                        title: 'Taller Registrada',
                         text: `Su puntuacion es de: ${puntuacion}/10, Debe acertar en todas las preguntas para completar la tarea, caso contario debera repetir el taller`,
                         icon: 'warning',
                     }).then((resp) => {
@@ -354,6 +375,21 @@ class Evaluacion extends Component {
             }
         })
 
+    }
+    save_resultados(id_user, ci_user, id_taller, preguntas_eval, respuestas_eval, estado_resp_eval){
+//        console.log(id_user);
+//        console.log(ci_user);
+//        console.log(id_taller);
+//        console.log(preguntas_eval);
+//        console.log(respuestas_eval);
+        
+        const datos={id_user:id_user,ci_user:ci_user,id_taller:id_taller,preguntas_eval:preguntas_eval,respuestas_eval:respuestas_eval,estado_resp_eval:estado_resp_eval};
+        
+        axios.post(`${REACT_APP_HOST}/api/resultados/`, datos).then((response)=> {
+            if(response){
+              console.log('resultados registrados exitosamente')
+            }
+        });
     }
 
     render() {

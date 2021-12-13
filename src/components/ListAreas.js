@@ -1,5 +1,6 @@
 import  React, {Component}from'react';
 import style from '../index.css';
+import style_card from '../card_style_areas.css';
 import {Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, formGroup, CardTitle, Card, CardBody, CardHeader, CardImg, CardText}from 'reactstrap';
 import axios from 'axios';
 import{Link} from'react-router-dom';
@@ -9,7 +10,7 @@ import Breadcrumb_nav from '../components/Breadcrumb_nav';
 
 import Cookies from 'universal-cookie';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import {faChartPie, faStepBackward,faLayerGroup}from '@fortawesome/free-solid-svg-icons'
+import {faChartPie, faStepBackward,faLayerGroup, faFileSignature}from '@fortawesome/free-solid-svg-icons'
 
 
 const cookies = new Cookies();
@@ -62,31 +63,59 @@ export default class ListAreas extends Component {
                         {
                     this.state.areas.map((area) => (
                                                 <div className="col-md-3" key={area._id} style={styles.div}>
-                                                    <Link to={`/listTalleres/${area._id}`} style={{color: "black", textDecoration: "none black"}}>
-                                                        <Card className="card_taller">
-                                                        <CardHeader>
-                                                        <div  className="row  pl-2">
-                                                            <div className="  col-md-10">
-                                                                <CardTitle className="font-weight-bold" tag="h5">{area.title} </CardTitle>
+
+                                                    
+                                                    
+                                                     <section className="card-section">
+                                                        <div className="card_">
+                                                            <div className="flip-card">
+                                                                <div className="flip-card__container">
+                                                                    <div className="card-front">
+                                                                        <div className="card-front__tp card-front__tp--dark">
+                                                                                        <p className="card-front__text-price">
+                                                                                          <FontAwesomeIcon icon={faFileSignature} size="2x"/>
+                                                                                       </p>
+                                                                                       <h2 className="card-front__heading">
+                                                                                           <CardTitle className="font-weight-bold" tag="h5">{area.title} </CardTitle>
+                                                                                       </h2>
+                                                                                      
+                                                                        </div>
+
+                                                                        <div className="card-front__bt">
+                                                                            <p className="card-front__text-view card-front__text-view--dark">
+                                                                                Ver mas
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="card-back">
+                                                                    <CardImg className="image"  src={`${REACT_APP_PATCH}imgareas%2F${area.image}?alt=media`} alt="Card image cap" /> 
+
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className=" col-md-2">
-                                                              <span style={{fontSize: 20, color:'#6c757d'}}><FontAwesomeIcon icon={faLayerGroup}/></span>
+
+                                                            <div className="inside-page">
+                                                                <div className="inside-page__container">
+                                                                    <h3 className="inside-page__heading inside-page__heading--dark">
+                                                                        Detalle
+                                                                    </h3>
+                                                                    <p className="inside-page__text">
+                                                                       <CardText style={{fontSize:'13px'}}>{area.description}</CardText>
+                                                                    </p>
+                                                                     <Link className=" inside-page__btn--dark " to={`/listTalleres/${area._id}`} style={{color: "black", textDecoration: "none black"}}>
+                                                                      <span className="inside-page__btn inside-page__btn--dark">Talleres</span>
+                                                                    </Link>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        </CardHeader>
-                                        
-                                                        <CardBody className="text-center">
-                                                            <CardImg className="image" top width="100%" src={`${REACT_APP_PATCH}imgareas%2F${area.image}?alt=media`} alt="Card image cap" /> 
-                                                            <CardText>{area.description}</CardText>
-                                                            
-                                                        </CardBody>
-                                                        </Card>
-                                                    </Link>
+                                                    </section>
                                                 </div>
                                 ))
                         }
-                
-                
+ 
+
+                       
                 
                     </div>
                     <div className="row col-md-3">

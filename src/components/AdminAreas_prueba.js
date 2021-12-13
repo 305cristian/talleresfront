@@ -11,9 +11,8 @@ import Breadcrumb_nav from '../components/Breadcrumb_nav';
 import Cookies from 'universal-cookie';
 import firebase from '../../src/setting/server_firebase';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome';
-import {faCheckCircle, faExclamationCircle, faExclamationTriangle, faEdit, faTrash, faFile,faFileExcel}from '@fortawesome/free-solid-svg-icons';
+import {faCheckCircle, faExclamationCircle, faExclamationTriangle}from '@fortawesome/free-solid-svg-icons';
 import DataTable from "@material-table/core";
-import XLSX from 'xlsx'
 
 const cookies = new Cookies();
 
@@ -232,24 +231,6 @@ class AdminAreas extends Component {
         this.setState({image: e.target.files[0],aux: e.target.files[0]});
         console.log(e.target.files[0]);
     }
-     downloadReporte=(e)=>{
-      const newData=this.state.areas.map(row=>{
-        delete row._id;
-        delete row.__v;
-        return row;
-      })
-      const workSheet=XLSX.utils.json_to_sheet(newData);
-      const workBook=XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workBook,workSheet,"areas");
-      //Buffer
-      let buf=XLSX.write(workBook,{bookType:"xlsx",type:"buffer"});
-      //Binary string
-      XLSX.write(workBook,{bookType:"xlsx",type:"binary"});
-      //Download
-      XLSX.writeFile(workBook,"Areas.xlsx");
-
-
-    }
     
     
 
@@ -263,10 +244,7 @@ class AdminAreas extends Component {
                         <br/>
                         <Button color="primary" onClick={this.showModal}>Nueva Area</Button>
                         <br/>
-                         
-                        <br/>
-                        {this.state.areas.length > 0 ?
-                                <DataTable
+                         <DataTable
                            
                                 columns={[
                                    {title:'AREA', field:'title'},
@@ -278,20 +256,16 @@ class AdminAreas extends Component {
                                 title='Lista de Areas'
                                 actions={[                                   
                                     {
-                                        icon:()=><span className="btn btn-warning btn-sm"><FontAwesomeIcon icon={faEdit}/></span>,
+                                        icon:'edit',
+                                        iconProps: { style: { fontSize: "18px", color: "white", backgroundColor:'orange' } },
                                         tooltip:'Editar Area',
                                         onClick:(event, rowData)=>{this.showModal();this.editArea(rowData._id); }                                         
                                     },
                                     {
-                                       icon:()=><span className="btn btn-danger btn-sm"><FontAwesomeIcon icon={faTrash}/></span>,
+                                        icon:'delete',
+                                        iconProps: { style: { fontSize: "18px", color: "white", backgroundColor:'red'} },
                                         tooltip:'Eliminar Area',
-                                        onClick:(event, rowData)=>this.deleteArea(rowData._id, rowData.image)
-                                    },
-                                    {
-                                        icon:()=><span className="btn btn-success btn-sm" ><FontAwesomeIcon icon={faFileExcel}/> Exportar</span>,
-                                        tooltip:'Exportar a Excel',
-                                        onClick:()=>this.downloadReporte(),
-                                        isFreeAction:true
+                                        onClick:(event, rowData)=>this.deleteUser(rowData._id, rowData.image)
                                     }
                                 ]}
                                 options={{
@@ -302,8 +276,8 @@ class AdminAreas extends Component {
                                         color: '#FFF'
                                     },
                                     padding:'default',//dense
-                                    pageSize:7,
-                                    pageSizeOptions:[7,15,30],
+                                    pageSize:8,
+                                    pageSizeOptions:[8,15,30],
                                     paginationType:'stepped'
                                 }}
                                 localization={{
@@ -313,8 +287,43 @@ class AdminAreas extends Component {
                                         actions:'ACCIONES'
                                     }
                                 }}
-                                 style={{fontSize: "15px", padding:'15px', cellPadding:'0px'}}
-                            />    
+                                 style={{fontSize: "12px", padding:'15px', cellPadding:'0px'}}
+                            />
+                        <br/>
+                        {this.state.areas.length > 0 ?
+                                    <Table>
+                                        <thead>
+                                            <tr>
+                                                <th>AREA</th>
+                                                <th>DETALLE</th>
+                                                <th>IMG_DIR</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                        this.state.areas.map(data => {
+                                                            return(
+                                                                <tr key={data._id}>
+                                                                    <td>{data.title}</td>
+                                                                    <td>{data.description}</td>
+                                                                    <td>{data.image}</td>
+                                                                    <td>
+                                                                        <Button color="warning" onClick={() => {
+                                                                                                this.showModal();
+                                                                                                this.editArea(data._id);
+                                                                                                    }}>Edit</Button>{' '}
+                                                
+                                                                        <Button color="danger" onClick={ () => {
+                                                                                                this.deleteArea(data._id,data.image)
+                                                                                                    }}>Delete</Button>
+                                                                    </td>
+                                                                </tr>
+                                                                    )
+                                                        })
+                                            }
+                                        </tbody>
+                                    </Table>
                                     : <h5 className="text-warning">! Atencion, No se encontraron areas registradas <FontAwesomeIcon icon={faExclamationTriangle}/></h5>}
                         <Modal isOpen={this.state.modalOpen}>
                             <ModalHeader>

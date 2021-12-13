@@ -6,7 +6,11 @@ import axios from 'axios'
 import P from '../components/P';
 import Styles from '../index.css'
 import md5 from 'md5';
-
+import DataTable from "@material-table/core";
+import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
+import { faFileAlt, faEdit, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo,faFileExcel }from '@fortawesome/free-solid-svg-icons'
+//import DataTable from 'material-table';
+import XLSX from 'xlsx'
 import Navigation from '../components/Navigation';
 import Breadcrumb_nav from '../components/Breadcrumb_nav';
 import Cookies from 'universal-cookie';
@@ -43,6 +47,30 @@ const validation = data => {
     }
     return errors;
 }
+
+const paginacion={
+                                        labelRowsSelect:'Filas',
+                                        labelRowsPerPage:'Filas por Pagina',
+                                        previousAriaLabel:'Pagina Anterior',
+                                        previousTooltip:'Pagina Anterior',
+                                        nextAriaLabel:'Siguiente Página',
+                                        nextTooltip:'Siguiente Página',
+                                        lastAriaLabel:'Ultima page',
+                                        lastTooltip:'Ultima page',
+                                        firstAriaLabel:'Primera Página',
+                                        firstTooltip:'Primera Página'
+}
+
+const toolbar={
+    exportTitle:'Exportar',
+    exportAriaLabel:'Exportar',
+    exportName:'Exportar a',
+    searchTooltip:'Buscar',
+    searchPlaceholder:'Buscar'
+}
+
+
+
 class AdminUsers extends Component {
     constructor() {
         super();
@@ -79,6 +107,8 @@ class AdminUsers extends Component {
             console.log(response.data);
         })
     }
+    
+    
 
     addUser(e) {
         e.preventDefault();
@@ -105,7 +135,11 @@ class AdminUsers extends Component {
                 datos.append('image', this.state.image.name);
             }else{
                  console.log('guardo');
-                datos.append('image', this.state.image.name); 
+                 if(this.state.aux!==''){
+                    datos.append('image', this.state.image.name); 
+                 }else{
+                    datos.append('image', '...');  
+                 }
             }
             
             if (this.state._id) {
@@ -168,10 +202,10 @@ class AdminUsers extends Component {
         })
     }
 
-    deleteUser(id, image) {
+    deleteUser(id, image, nombre, apellido) {
         this.setState({img_temp:image});
         Swal({
-            title: 'Esta seguro de eliminar el Usuario',
+            title: `Esta seguro de eliminar el Usuario ${nombre} ${apellido}`,
             text: ' El usuario se eliminara definitivamente',
             icon: 'warning',
             buttons: ['Cancelar', 'Sí'],
@@ -180,7 +214,9 @@ class AdminUsers extends Component {
             if (value) {
                 axios.delete(`${REACT_APP_HOST}/api/users/` + id).then(async(response) => {
                     console.log(response.data);
-                    let eliminar = await this.deleteImage();
+                    if(this.state.img_temp!=='...'){
+                        let eliminar = await this.deleteImage();
+                    }
                     Swal({
                         title: 'Usuario eliminada',
                         icon: 'success',
@@ -237,7 +273,29 @@ class AdminUsers extends Component {
         this.setState({image: e.target.files[0], aux:e.target.files[0]});
         console.log(e.target.files[0]);
     }
+    
+    downloadReporte=(e)=>{
+      const newData=this.state.users.map(row=>{
+        delete row._id;
+        delete row.__v;
+        delete row.pass;
+        return row;
+      })
+      const workSheet=XLSX.utils.json_to_sheet(newData);
+      const workBook=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workBook,workSheet,"usuarios");
+      //Buffer
+      let buf=XLSX.write(workBook,{bookType:"xlsx",type:"buffer"});
+      //Binary string
+      XLSX.write(workBook,{bookType:"xlsx",type:"binary"});
+      //Download
+      XLSX.writeFile(workBook,"Usuarios.xlsx");
 
+
+    }
+    
+    
+    
     render() {
         const {errors} = this.state;
         return (
@@ -249,47 +307,65 @@ class AdminUsers extends Component {
                         <br/>
                         <Button color="primary" onClick={this.showModal}>Nuevo Usuario</Button>
                         <br/>
+                        
                         <br/>
                         {this.state.users.length > 0 ?
-                                    <Table>
-                                        <thead>
-                                            <tr>
-                                                <th>NOMBRE</th>
-                                                <th>APELLIDO</th>
-                                                <th>CEDULA</th>
-                                                <th>USUARIO</th>
-                                                <th>ROL</th>
-                                                <th>IMAGE</th>
-                                                <th>ACCIONES</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {
-                                        this.state.users.map(data => {
-                                            return(
-                                                                                <tr key={data._id}>
-                                                                                    <td>{data.nombre}</td>
-                                                                                    <td>{data.apellido}</td>
-                                                                                    <td>{data.cedula}</td>
-                                                                                    <td>{data.user}</td>
-                                                                                    <td>{data.rol}</td>
-                                                                                    <td>{data.image}</td>
-                                                                                    <td>
-                                                                                        <Button color="warning" onClick={() => {
-                                                                                        this.showModal();
-                                                                                        this.editUser(data._id);
-                                                                                                            }}>Edit</Button>{' '}
-                                                                
-                                                                                        <Button color="danger" onClick={ () => {
-                                                                                        this.deleteUser(data._id, data.image)
-                                                                                    }}>Delete</Button>
-                                                                                    </td>
-                                                                                </tr>
-                                                    )
-                                        })
-                                            }
-                                        </tbody>
-                                    </Table>
+                            <DataTable
+                           
+                                columns={[
+                                   {title:'NOMBRE', field:'nombre'},
+                                   {title:'APELLIDO', field:'apellido'},
+                                   {title:'CÉDULA', field:'cedula',type:'numeric'},
+                                   {title:'USUARIO', field:'user'},
+                                   {title:'ROL', field:'rol'},
+                                   {title:'IMAGEN', field:'image'},
+                                ]}
+                                data={this.state.users}
+                                title='Lista de Usuarios del Sistema'
+                                actions={[                                   
+                                    {
+                                        icon:()=><span className="btn btn-warning btn-sm" ><FontAwesomeIcon icon={faEdit}/></span>,
+                                        tooltip:'Editar Usuario',
+                                        onClick:(event, rowData)=>{this.showModal();this.editUser(rowData._id); }                                         
+                                    },
+                                    {
+                                        icon:()=><span className="btn btn-danger btn-sm" ><FontAwesomeIcon icon={faTrash}/></span>,
+                                        tooltip:'Eliminar Usuario',
+                                        onClick:(event, rowData)=>this.deleteUser(rowData._id, rowData.image, rowData.nombre, rowData.apellido)
+                                    },
+                                    {
+                                        icon:()=><span className="btn btn-success btn-sm" ><FontAwesomeIcon icon={faFileExcel}/> Exportar</span>,
+                                        tooltip:'Exportar a Excel',
+                                        onClick:()=>this.downloadReporte(),
+                                        isFreeAction:true
+                                    }
+                                ]}
+                                options={{
+                                    actionsColumnIndex:-1,
+                                    toolbar: true,        
+                                    exportButton:true,
+                                    filtering: true,
+                                    headerStyle: {
+                                        backgroundColor: '#343a40',
+                                        color: '#FFF'
+                                    },
+                                    padding:'default',//dense
+                                    pageSize:8,
+                                    pageSizeOptions:[8,15,30],
+                                    paginationType:'stepped'
+                                }}
+                                localization={{
+                                    pagination:  paginacion,
+                                    toolbar: {
+                                        exportCSVName: "Export some Excel format",
+                                        exportPDFName: "Export as pdf!!"
+                                    },
+                                    header:{
+                                        actions:'ACCIONES'
+                                    }
+                                }}
+                                 style={{fontSize: "12px", padding:'15px', cellPadding:'0px'}}
+                            />
                             : <h1>No hay Usuarios registrados</h1>}
                         <Modal isOpen={this.state.modalOpen}>
                             <ModalHeader>

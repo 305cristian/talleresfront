@@ -1,11 +1,11 @@
 import React, {Component}from'react';
 import {render}from'react-dom';
-import {Table, Button, Container, CustomInput, Modal, ModalHeader, ModalBody, ModalFooter, formGroup, Row, Col, InputGroup,InputGroupText, Input}from 'reactstrap';
+import {Table, Button, Container, CustomInput, Modal, ModalHeader, ModalBody, ModalFooter, formGroup, Row, Col}from 'reactstrap';
 import Swal from 'sweetalert';
 import axios from 'axios'
 import P from '../components/P';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import { faFileAlt, faEdit,faEye, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo, faFileExcel }from '@fortawesome/free-solid-svg-icons'
+import { faFileAlt, faEdit,faEye, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo }from '@fortawesome/free-solid-svg-icons'
 //import { faApple} from '@fortawesome/free-brands-svg-icons'
 
 import Navigation from '../components/Navigation';
@@ -17,7 +17,6 @@ import firebase from '../../src/setting/server_firebase';
 
 import DataTable from "@material-table/core";
 import {Grid, Avatar} from "@material-ui/core";
-import XLSX from 'xlsx'
 
 
 
@@ -81,7 +80,7 @@ class AdminTalleres extends Component {
             areas: [],
             _id: '',
             textButton: 'REGISTRAR',
-            header: 'Insertar Taller',
+            header: 'Insertar Tarea',
             modalOpen: false,
             modalEval: false,
             videoload: false,
@@ -90,9 +89,7 @@ class AdminTalleres extends Component {
             video: '...',
             video_temp: '',
             tiempo: '30',
-            intentos: '2',
-            aprobacion: '10',
-            estado: '1',
+            intentos: '1',
             evaluacion:'0',
             errors: {},
 
@@ -172,8 +169,6 @@ class AdminTalleres extends Component {
             datos.append('tiempo', this.state.tiempo);
             datos.append('intentos', this.state.intentos);
             datos.append('evaluacion', this.state.evaluacion);
-            datos.append('aprobacion', this.state.aprobacion);
-            datos.append('estado', this.state.estado);
             
 
             if (this.state._id && this.state.aux==='') {
@@ -211,28 +206,28 @@ class AdminTalleres extends Component {
                 axios.put(`${REACT_APP_HOST}/api/talleres/` + this.state._id, datos).then(async(data) => {
                     console.log(data);
                     Swal({
-                        title: 'Taller Actualizada',
+                        title: 'Tarea Actualizada',
                         text: 'ok',
                         icon: 'success',
                         timer: 2000,
                         button: false
                     });
                     this.getTalleres();
-                    this.setState({title: '', description: '', tiempo: '30', intentos: '1',aprobacion:'10',estado:'1', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '', aux:'',aux_v:'',errors: {}});
+                    this.setState({title: '', description: '', tiempo: '30', intentos: '1', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '', aux:'',aux_v:'',errors: {}});
                 }).catch(err => console.error(err));
             } else {
                 axios.post(`${REACT_APP_HOST}/api/talleres`, datos).then(async(data) => {
                     console.log(data);
                     let cargarimg = await this.uploadImage();
                     Swal({
-                        title: 'Taller Registrada',
+                        title: 'Tarea Registrada',
                         text: 'ok',
                         icon: 'success',
                         timer: 2000,
                         button: false
                     });
                     this.getTalleres()
-                    this.setState({title: '', description: '', tiempo: '30', intentos: '1',aprobacion:'10',estado:'1', image: '', aux:'', aux_v:''});
+                    this.setState({title: '', description: '', tiempo: '30', intentos: '1', image: '', aux:'', aux_v:''});
                 })
                         .catch(err => console.error(err));
             }
@@ -257,7 +252,7 @@ class AdminTalleres extends Component {
                         let eliminarvideo = await this.deleteVideo();
                     }
                     Swal({
-                        title: 'Taller eliminada',
+                        title: 'Tarea eliminada',
                         icon: 'success',
                         timer: 1000,
                         button: false
@@ -276,8 +271,6 @@ class AdminTalleres extends Component {
                 description: response.data.description,
                 tiempo: response.data.tiempo,
                 intentos: response.data.intentos,
-                aprobacion: response.data.aprobacion,
-                estado: response.data.estado,
                 evaluacion: response.data.evaluacion,
                 area_id: response.data.area_id,
                 image: response.data.image,
@@ -286,7 +279,7 @@ class AdminTalleres extends Component {
                 video_temp: response.data.video,
                 _id: response.data._id,
                 textButton: 'ACTUALIZAR',
-                header: 'Actualizar Taller',
+                header: 'Actualizar Tarea',
                 videoload: true,
 
             });
@@ -295,7 +288,7 @@ class AdminTalleres extends Component {
         })
     }
     hideModal() {
-        this.setState({title: '', description: '', tiempo: '', intentos: '',aprobacion:'',estado:'1', _id: '', textButton: 'REGISTRAR', header: 'Insertar Taller', modalOpen: false, image: null, errors: {}, videoload: false});
+        this.setState({title: '', description: '', tiempo: '', intentos: '', _id: '', textButton: 'REGISTRAR', header: 'Insertar Tarea', modalOpen: false, image: null, errors: {}, videoload: false});
     }
     showModal() {
         this.setState({modalOpen: true});
@@ -629,28 +622,6 @@ class AdminTalleres extends Component {
             }
         })
     }
-    
-    downloadReporte=(e)=>{
-      const newData=this.state.talleres.map(data=>{
-        delete data._id;
-        delete data.__v;
-        delete data.talleresArea;
-        
-        return data;
-      })
-      const workSheet=XLSX.utils.json_to_sheet(newData);
-      const workBook=XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workBook,workSheet,"talleres");
-      //Buffer
-      let buf=XLSX.write(workBook,{bookType:"xlsx",type:"buffer"});
-      //Binary string
-      XLSX.write(workBook,{bookType:"xlsx",type:"binary"});
-      //Download
-      XLSX.writeFile(workBook,"Talleres.xlsx");
-
-
-    }
-    
 
   
     render() {
@@ -663,11 +634,7 @@ class AdminTalleres extends Component {
                         <br/>
                         <Button size="sm" color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFile}/> Nuevo Taller</Button>
                         <br/>
-                          
-                        <br/>
-                        
-                        {this.state.talleres.length > 0 ?
-                                <DataTable
+                        <DataTable
                            
                                 columns={[
                                    {title:'AREA', field:'talleresArea.title'},
@@ -675,47 +642,39 @@ class AdminTalleres extends Component {
                                    {title:'DESCRIPCION', field:'description'},
                                    {title:'TIEMPO', field:'tiempo',render:(rowData)=><Grid><Avatar>{rowData.tiempo}</Avatar>Minutos</Grid>},
                                    {title:'INTENTOS', field:'intentos',render:(rowData)=><Grid><Avatar>{rowData.intentos}</Avatar></Grid>},
-                                   {title:'APROBACIÓN', field:'aprobacion',render:(rowData)=><Grid><Avatar>{rowData.aprobacion}</Avatar></Grid>},
-                                   
-                                   {title:'ESTADO', field:'estado',
-                                       render:(rowData)=>rowData.estado==='0'?<span size="sm" className='badge text-white bg-danger'>Inactivo <FontAwesomeIcon icon={faFileAlt} /></span>
-                                   :<span size="sm" className='badge bg-success text-white'>Activo <FontAwesomeIcon icon={faCheckCircle}/></span>
-                                   
-                                    },
-                                   
                                    {title:'IMG-DIR', field:'image'},
                                    {title:'VID-DIR', field:'video'},                                
                                    {title:'EVALUACIÓN', field:'evaluacion',
-                                       render:(rowData)=>rowData.evaluacion==='0'?<Button size="sm" color="info" className="text-white" onClick={()=>{this.showModalEval(rowData._id)}}>Crear <FontAwesomeIcon icon={faFileAlt} /></Button>
-                                   :<Button size="sm" color="success" className="text-white" onClick={()=>{this.showModalEval(rowData._id)}}>Editar <FontAwesomeIcon icon={faCheckCircle}/></Button>
+                                   render:(rowData)=>rowData.evaluacion==='0'?<span className="badge bg-info text-white">Crear <FontAwesomeIcon icon={faFileAlt} /> Ev.  ==>></span>
+                                   :<span className="badge bg-success text-white">Editar <FontAwesomeIcon icon={faCheckCircle}/> Ev.  ==>></span>
                                    
                                     }
-                
+                                  
+                                   //}
+                                   
                                                
                                    
                                 ]}
                                 data={this.state.talleres}
                                 title='Lista de Talleres'
                                 actions={[                                   
-//                                   
                                     {
                                         icon:()=><a className="btn btn-warning btn-sm" size="sm"><FontAwesomeIcon icon={faEdit}/></a>,
+                                        tooltip:'Ver Evaluación',
+                                        onClick:(event, rowData)=>{this.showModalEval(rowData._id)} 
+                                                                               
+                                    },
+                                    {
+                                        icon:()=><a className="btn btn-danger btn-sm" size="sm"><FontAwesomeIcon icon={faTrash}/></a>,
                                         tooltip:'Editar Taller',
                                         onClick:(event, rowData)=>{this.showModal();this.editTaller(rowData._id); }                                         
                                     },
                                     {
-                                        icon:()=><a className="btn btn-danger btn-sm" size="sm"><FontAwesomeIcon icon={faTrash}/></a>,
+                                       icon:()=><Button color="danger" size="sm"><FontAwesomeIcon icon={faTrash}/></Button>,
                                         tooltip:'Eliminar Taller',
                                         onClick:(event, rowData)=>this.deleteTaller(rowData._id, rowData.image,rowData.video, rowData.title)
-                                    },
-                                      {
-                                        icon:()=><span className="btn btn-success btn-sm" ><FontAwesomeIcon icon={faFileExcel}/> Exportar</span>,
-                                        tooltip:'Exportar a Excel',
-                                        onClick:()=>this.downloadReporte(),
-                                        isFreeAction:true
                                     }
                                 ]}
-
                                 options={{
                                     actionsColumnIndex:-1,
                                     exportButton:true,
@@ -732,14 +691,67 @@ class AdminTalleres extends Component {
                                     pagination:  paginacion,
                                     toolbar:toolbar,
                                     header:{
-                                        actions:'ACCIONES'
+                                        actions:'EVAL.   ACCIONES'
                                     }
                                 }}
                                  style={{fontSize: "15px", padding:'15px', cellPadding:'0px'}}
-                            />    
+                            />  
+                        <br/>
+                        {this.state.talleres.length > 0 ?
+                                    <Table>
+                                        <thead>
+                                            <tr>
+                                                <th>AREA</th>
+                                                <th>TALLER</th>
+                                                <th>DESCRIPCION</th>
+                                                <th><FontAwesomeIcon icon={faClock}/></th>
+                                                <th><FontAwesomeIcon icon={faRedo}/></th>
+                                                <th>IMG_DIR</th>
+                                                <th>VD_DIR</th>
+                                                <th>EVALUAR</th>
+                                                <th>ACCIONES</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                        this.state.talleres.map((data, index) => {
+                                                            return(
+                                                                                <tr key={data._id}>
+                                                                                    <td>{data.talleresArea.title}</td>
+                                                                                    <td>{data.title}</td>
+                                                                                    <td>{data.description}</td>                                                                   
+                                                                                    <td>{data.tiempo} {'min'}</td>                                                                   
+                                                                                    <td>{data.intentos}</td>                                                                   
+                                                                                    <td>{data.image}</td>
+                                                                                    <td>{data.video}</td>
+                                                                                    
+                                                                                    {data.evaluacion === '0' ?
+                                                                                    <td> <Button color="info" size="sm" onClick={() => {
+                                                                                        this.showModalEval(data._id)
+                                                                                                            }}><span>Crear <FontAwesomeIcon icon={faFileAlt}/></span></Button>
+                                                                                    </td>
+                                                                                    :<td> <Button color="success" size="sm" onClick={() => {
+                                                                                        this.showModalEval(data._id)
+                                                                                                            }}><span>Editar <FontAwesomeIcon icon={faCheckCircle}/></span></Button>
+                                                                                    </td>
+                                                                                    }
+                                                                                    <td>
+                                                                                        <Button color="warning" onClick={() => {
+                                                                                        this.showModal();
+                                                                                                                this.editTaller(data._id);
+                                                                                                            }} size="sm"><FontAwesomeIcon icon={faEdit}/></Button>{' '}
+                                                                
+                                                                                        <Button color="danger" onClick={ () => {
+                                                                                        this.deleteTaller(data._id, data.image, data.video)
+                                                                                                            }} size="sm"><FontAwesomeIcon icon={faTrash}/></Button>
+                                                                                    </td>
+                                                                                </tr>
+                                                    )
+                                                        })
+                                            }
+                                        </tbody>
+                                    </Table>
                             : <h1>No hay talleres registrados</h1>}
-                            
-                            
                         <Modal isOpen={this.state.modalOpen}>
                             <ModalHeader>
                                 <div><h3>{this.state.header}</h3></div>
@@ -782,43 +794,19 @@ class AdminTalleres extends Component {
                             : <p style={{color: 'blue', fontSize: 12}}>Para cargar una presentacion utilize la opcion Editar</p>
                                     }
                                     <div className="row py-2 border bg-info">
-                                        <div className="col-md-12 text-left">
-                                            <p className="font-weight-bold text-white" style={{fontSize: 15}}>Esta sección en caso de evaluación</p>                
+                                        <div className="col-md-4 text-center">
+                                            <p className="font-weight-bold" style={{fontSize: 13}}>Esta sección en caso de evaluación</p>                
                                         </div>
-                                         <InputGroup className="col-md-6">
-                                            <InputGroupText>
-                                              Tiempo
-                                            </InputGroupText>
-                                                <Input type="number" name="tiempo" onChange={this.handleChange} value={this.state.tiempo} placeholder="Tiempo de eval"/>
-                                          </InputGroup>
-                                         <InputGroup className=" col-md-6" >
-                                            <InputGroupText>
-                                              # Intentos
-                                            </InputGroupText>
-                                                <Input type="number" name="intentos" onChange={this.handleChange} value={this.state.intentos} placeholder="Intentos eval"/>
-                                          </InputGroup>                                         
-                                         <InputGroup className=" col-md-12 my-1" >
-                                            <InputGroupText>
-                                              Puntos para Aprobación
-                                            </InputGroupText>
-                                                <Input type="number" name="aprobacion" onChange={this.handleChange} value={this.state.aprobacion} placeholder="Aprobar con"/>
-                                          </InputGroup>                                         
-                                     
+                                        <div className="col-md-4">
+                                            <input type="number" name="tiempo" onChange={this.handleChange} value={this.state.tiempo} className="form-control form-control-sm" placeholder="Tiempo de eval"/>
+                
+                                        </div>
+                                        <div className="col-md-4">
+                                            <input type="number" name="intentos" onChange={this.handleChange} value={this.state.intentos} className="form-control form-control-sm" placeholder="Intentos eval"/>
+                
+                                        </div>
                                     </div>
-                                    <div className="row my-2">
-                                    <InputGroup className="my-1" >
-                                        <InputGroupText>
-                                            Estado del Taller
-                                        </InputGroupText>
-                                        <select className="form-control" name="estado" onChange={this.handleChange} value={this.state.estado}>
-                                            <option value='1'>Activo</option>
-                                            <option value="0">Inactivo</option>
-                                        </select>
-                                    </InputGroup> 
-                                    </div>                                  
                                     <br/>
-                                    
-                                    
                                     <Button size='sm' id="btnInsertar">{this.state.textButton}</Button>{' '}
                                     <Button size='sm' id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
                                 </form>
@@ -833,7 +821,7 @@ class AdminTalleres extends Component {
                                     <h4>Preguntas y Respuestas</h4>
                                     </Col>
                                     <Col xs='1'>
-                                    <Button color="danger" size="sm" onClick={() => {
+                                    <Button color="secondary" size="sm" onClick={() => {
                         this.hideModalEval()
                                         }}>X</Button>
                                     </Col>
