@@ -141,3 +141,10 @@ body{
     background-image: url('img/fondo_login.jpg');
     background-size: contain;
 }
+
+main {
+/*background-color: #6a6b6b;*/
+    margin:3rem auto;
+    max-width:75%;
+    display:block;
+}

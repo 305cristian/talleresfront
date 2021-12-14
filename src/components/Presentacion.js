@@ -9,6 +9,11 @@ import Breadcrumb_nav from '../components/Breadcrumb_nav';
 
 import Cookies from 'universal-cookie';
 
+import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
+import {faPenAlt}from '@fortawesome/free-solid-svg-icons'
+
+import ShakaPlayer from 'shaka-player-react';
+import 'shaka-player/dist/controls.css';
 
 
 const cookies = new Cookies();
@@ -60,34 +65,42 @@ function Presentacion() {
     return(
             <div>
                 <Navigation />
-                <div className="containerFluid mt-3 p-2" >
+                <main className="bg-dark">
                     {taller.video !== '...' ?
+                           
                             <Row>
-                                <Col xs={3} >
-                                <Card>
-                                <CardHeader><div className="pl-2"><CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle></div></CardHeader>
-                                <CardBody><div className="pl-2"><CardText>{taller.description}</CardText></div></CardBody>
-                                <div className="pl-2 pb-2 text-center">
-                                    <Link to={`/evaluacion/${id}`}target="_blank"><Button disabled={!value} color="success">Evaluacion</Button></Link>
+                                                                                                                          
+                                <div className=" col-md-12 d-flex text-white p-3">
+                                    <div className=" col-md-12">
+                                        <div className="d-flex"><CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle></div>
+                                    </div>
+                                   
                                 </div>
-                                </Card>
-                                </Col>
-                                <Col xs={9}>
-                    
+                                
+                                <Col xs={12}>
+
                                 <ReactPlayer
                                     url={`${REACT_APP_PATCH_VID}videostaller%2F${taller.video}?alt=media`}   
-                                    controls
+                                    controls={true}
+                                    className="react-player"
                                     width='100%'
                                     height='100%'    
-                    
+                                    playing={true}
                                     onEnded={evalEnable}
                                     onPlay={evalDisable}
+                                    
                                     />
+                                    
                     
                     
                                 </Col>
                     
-                    
+                                <div className=" col-md-12 d-flex text-white p-3">
+                                   
+                                    <div className=" col-md-12 text-right">
+                                        <Link to={`/evaluacion/${id}`}target="_blank"><Button size="lg" disabled={!value} color="success"><FontAwesomeIcon icon={faPenAlt}/> Evaluación</Button></Link>                                                              
+                                    </div>
+                                </div>
                     
                             </Row>
                                 :
@@ -113,7 +126,7 @@ function Presentacion() {
                     
                             </div>
                     }
-                </div>
+                </main>
             </div>
             )
 

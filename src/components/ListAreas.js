@@ -76,7 +76,7 @@ export default class ListAreas extends Component {
                                                                                           <FontAwesomeIcon icon={faFileSignature} size="2x"/>
                                                                                        </p>
                                                                                        <h2 className="card-front__heading">
-                                                                                           <CardTitle className="font-weight-bold" tag="h5">{area.title} </CardTitle>
+                                                                                           <CardTitle className="font-weight-bold" >{area.title} </CardTitle>
                                                                                        </h2>
                                                                                       
                                                                         </div>
@@ -101,7 +101,7 @@ export default class ListAreas extends Component {
                                                                         Detalle
                                                                     </h3>
                                                                     <p className="inside-page__text">
-                                                                       <CardText style={{fontSize:'13px'}}>{area.description}</CardText>
+                                                                       <span style={{fontSize:'13px'}}>{area.description}</span>
                                                                     </p>
                                                                      <Link className=" inside-page__btn--dark " to={`/listTalleres/${area._id}`} style={{color: "black", textDecoration: "none black"}}>
                                                                       <span className="inside-page__btn inside-page__btn--dark">Talleres</span>

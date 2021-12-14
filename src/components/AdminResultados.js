@@ -312,7 +312,7 @@ datatabla(){
                     table="consolidado"
                     filename="Consolidado de Respuestas"
                     sheet="HOJA 1"
-                    buttonText="Download as XLS"/>
+                    buttonText="Descargar as XLS"/>
                 <ModalBody>
                   <div className=" my-3" style={{overflowX: 'auto'}}>                         
                         <table id='consolidado' className='table table-nowrap' style={{fontSize:'11px'}}>

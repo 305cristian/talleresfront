@@ -218,7 +218,7 @@ class AdminTalleres extends Component {
                         button: false
                     });
                     this.getTalleres();
-                    this.setState({title: '', description: '', tiempo: '30', intentos: '1',aprobacion:'10',estado:'1', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: '', aux:'',aux_v:'',errors: {}});
+                    this.setState({title: '', description: '', tiempo: '30', intentos: '1',aprobacion:'10',estado:'1', _id: '', textButton: 'REGISTRAR',header: 'Insertar Taller', modalOpen: false, image: '',videoload:false, aux:'',aux_v:'',errors: {}});
                 }).catch(err => console.error(err));
             } else {
                 axios.post(`${REACT_APP_HOST}/api/talleres`, datos).then(async(data) => {
@@ -295,7 +295,7 @@ class AdminTalleres extends Component {
         })
     }
     hideModal() {
-        this.setState({title: '', description: '', tiempo: '', intentos: '',aprobacion:'',estado:'1', _id: '', textButton: 'REGISTRAR', header: 'Insertar Taller', modalOpen: false, image: null, errors: {}, videoload: false});
+        this.setState({title: '', description: '', tiempo: '30', intentos: '1',aprobacion:'10',estado:'1', _id: '', textButton: 'REGISTRAR', header: 'Insertar Taller', modalOpen: false, image: null,aux:'',aux_v:'', errors: {}, videoload: false});
     }
     showModal() {
         this.setState({modalOpen: true});
