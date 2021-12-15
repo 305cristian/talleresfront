@@ -8,7 +8,7 @@ import Styles from '../index.css'
 import md5 from 'md5';
 import DataTable from "@material-table/core";
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import { faFileAlt, faEdit, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo,faFileExcel }from '@fortawesome/free-solid-svg-icons'
+import { faFileAlt, faEdit, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo,faFileExcel, faUser }from '@fortawesome/free-solid-svg-icons'
 //import DataTable from 'material-table';
 import XLSX from 'xlsx'
 import Navigation from '../components/Navigation';
@@ -201,6 +201,21 @@ class AdminUsers extends Component {
             console.log(this.state.image)
         })
     }
+    
+    validarEliminacion(id, image, nombre, apellido){
+        axios.get(`${REACT_APP_HOST}/api/user_taller/` + id).then((response) =>{
+            if(response.data <=0){
+                this.deleteUser(id, image, nombre, apellido);
+            }else{
+                Swal({
+                title: '!Atención',
+                text:'Este Usuario tiene historial en el sistema, imposible eliminar',
+                icon: 'warning',
+                button: true
+           });
+            }
+        });
+    }
 
     deleteUser(id, image, nombre, apellido) {
         this.setState({img_temp:image});
@@ -305,7 +320,7 @@ class AdminUsers extends Component {
                 
                 
                         <br/>
-                        <Button color="primary" onClick={this.showModal}>Nuevo Usuario</Button>
+                        <Button color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faUser}/> Nuevo Usuario</Button>
                         <br/>
                         
                         <br/>
@@ -331,7 +346,7 @@ class AdminUsers extends Component {
                                     {
                                         icon:()=><span className="btn btn-danger btn-sm" ><FontAwesomeIcon icon={faTrash}/></span>,
                                         tooltip:'Eliminar Usuario',
-                                        onClick:(event, rowData)=>this.deleteUser(rowData._id, rowData.image, rowData.nombre, rowData.apellido)
+                                        onClick:(event, rowData)=>this.validarEliminacion(rowData._id, rowData.image, rowData.nombre, rowData.apellido)
                                     },
                                     {
                                         icon:()=><span className="btn btn-success btn-sm" ><FontAwesomeIcon icon={faFileExcel}/> Exportar</span>,

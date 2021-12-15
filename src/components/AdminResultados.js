@@ -118,11 +118,12 @@ datatabla(){
 }
 
     marcarCompletado(user, index) {
+//        alert(user);
         var taller_completado = [];
         var returnedobj = [];
-        var puntuacion='';
         this.state.talleres.map((taller, i) => {
             var estado = '0';
+            var puntuacion='';
             this.state.user_talleres.map((user_taller, j) => {
                 if (user === user_taller.id_user) {
                     if (taller._id === user_taller.id_taller) {
@@ -133,7 +134,8 @@ datatabla(){
             })
             if (estado === '1') {
                 returnedobj = Object.assign(taller, {estado: '1', puntuacion:puntuacion});
-//                console.log(returnedobj)
+                console.log(user+ '--'+ taller._id+ '--'+ puntuacion+ '  est:1')
+                console.log(returnedobj)
             } else {
                 returnedobj = Object.assign(taller, {estado: '0'});
             }
@@ -143,12 +145,22 @@ datatabla(){
 //        console.log(taller_completado);
 
         talleres_comp = taller_completado;
-        console.log('dd  ',talleres_comp)
+//        console.log('--- ',talleres_comp)
+    }
+    
+    
+    getNotas(id_user, id_taller){
+      axios.get(`${REACT_APP_HOST}/api/user_taller/`+id_user+'/'+id_taller+'/0').then( (response)=> {
+            if(response.data){
+               this.setState({puntuacion:response.data.puntuacion}); 
+            }
+        })  
     }
     
     //ABRE MODAL RESULTADOS
     modalOpen(id_user, id_taller, puntuacion){
-       this.setState({modalOpen:true, puntuacion:puntuacion});
+       this.getNotas(id_user, id_taller);
+       this.setState({modalOpen:true});
        this.showResultados(id_user, id_taller);
 
     }
@@ -258,7 +270,7 @@ datatabla(){
                                               talleres_comp.map((data2) => (
                                                                      
                                                 <td key={data2._id}>
-                                                    {data2.estado==='1'?<a href='#' onClick={()=>{this.modalOpen(data._id, data2._id, data2.puntuacion);}}><span className=' text-success'>Completo <FontAwesomeIcon icon={faCheckCircle} /></span></a>
+                                                    {data2.estado==='1'?<a href='#' onClick={()=>{this.modalOpen(data._id, data2._id)}}><span className=' text-success'>Completo {data2.puntuacion} <FontAwesomeIcon icon={faCheckCircle} /></span></a>
                                                                        :<span className='text-warning badge'>En curso <FontAwesomeIcon icon={faExclamationCircle} /></span>}
                                                  </td>
                                                             

@@ -91,7 +91,7 @@ class login extends Component {
                     <div className="image_login modal-dialog sombra text-center border my-5">
                         <div className="modal-dialog text-center ">
                             <div className="col-sm-8 main-section">
-                                <p className="display-4" >LOGIN</p>
+                                <p className="display-4 text-white" >LOGIN</p>
                                 <hr className="bg-info col-md-8"></hr>   
                             </div>       
                         </div>
@@ -127,13 +127,18 @@ class login extends Component {
                                             <div className="mb-3 aler alert-danger">
                                                 <span className="display text-danger" id="idError"></span>
                                             </div>
-                
+                                                                     
                                         </form>
-                
+                                     
                                     </div> 
+                                      
                                 </div>
                             </div>
+                             
                         </div>
+                            <div>
+                                <h4 className="text-white">Sistema de Capacitaciones online</h4>
+                            </div>
                     </div>
                                 
                 </Container>

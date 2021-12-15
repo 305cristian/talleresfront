@@ -138,12 +138,13 @@ body{
 .image_login {
     width: 500px;
     height: 600px;
-    background-image: url('img/fondo_login.jpg');
     background-size: contain;
+    background: linear-gradient(#145BA8, #696A6B);   
 }
 
 main {
-/*background-color: #6a6b6b;*/
+border: 2px solid #ccc;
+   
     margin:3rem auto;
     max-width:75%;
     display:block;

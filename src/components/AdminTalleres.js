@@ -106,6 +106,7 @@ class AdminTalleres extends Component {
             puntaje: '',
             btnCreaPreg: 'Crear',
             _idpreg: '',
+            tipo_preg:'1',
 
             //respuesta
             pregunta_resp: '',
@@ -238,6 +239,22 @@ class AdminTalleres extends Component {
             }
         }
     }
+    
+    validarEliminacion(id, image, video, taller){
+        axios.get(`${REACT_APP_HOST}/api/preguntas/`+ id).then((response)=> {
+            if(response.data.length<=0){
+                this.deleteTaller(id, image, video, taller);
+            }else {
+                Swal({
+                title: '!Atención',
+                text:'Este Taller tiene Evaluacion registrados, imposible eliminar, !Puede desactivarlo',
+                icon: 'warning',
+                button: true
+           });
+            }
+        })
+    }
+    
     deleteTaller(id, image, video, taller) {
         this.setState({img_temp: image});
         this.setState({video_temp: video});
@@ -467,7 +484,8 @@ class AdminTalleres extends Component {
             taller_id: this.state.taller_id,
             pregunta: this.state.pregunta,
             puntaje: this.state.puntaje,
-            estadopreg: this.state.estadopreg
+            estadopreg: this.state.estadopreg,
+            tipo_preg: this.state.tipo_preg
 
         };
         if (this.state._idpreg) {
@@ -496,7 +514,7 @@ class AdminTalleres extends Component {
             }).catch(err => console.error(err));
         }
 
-        this.setState({idtaller: '', pregunta: '', puntaje: '', estadopreg: true, _idpreg: '', btnCreaPreg: 'Crear'});
+        this.setState({idtaller: '', pregunta: '', puntaje: '', estadopreg: true, _idpreg: '',tipo_preg:'1', btnCreaPreg: 'Crear'});
 
 
     }
@@ -507,10 +525,31 @@ class AdminTalleres extends Component {
     }
     editPregunta(id_preg) {
         axios.get(`${REACT_APP_HOST}/api/preguntas/` + this.state.taller_id + '/' + id_preg).then((response) => {
-            this.setState({pregunta: response.data.pregunta, puntaje: response.data.puntaje, _idpreg: response.data._id, estadopreg: response.data.estadopreg, btnCreaPreg: 'Actualizar'});
+            this.setState({pregunta: response.data.pregunta,
+                puntaje: response.data.puntaje,
+                _idpreg: response.data._id,
+                estadopreg: response.data.estadopreg,
+                tipo_preg: response.data.tipo_preg,
+                btnCreaPreg: 'Actualizar'});
         })
 
     }
+    
+    validarEliminacionPreg(id_preg){
+        axios.get(`${REACT_APP_HOST}/api/respuestas/` + id_preg+'/'+this.state.taller_id).then( (response)=> {
+            if(response.data<=0){
+                this.deletePregunta(id_preg);
+            }else{
+             Swal({
+                title: '!Atención',
+                text:'Esta pregunta tiene respuestas registrados, imposible eliminar, !Primero debe eliminar las respuestas de la misma',
+                icon: 'warning',
+                button: true
+           });
+            }
+        });
+    }
+    
     deletePregunta(id_preg) {
         Swal({
             title: 'Esta seguro de eliminar la pregunta',
@@ -661,7 +700,7 @@ class AdminTalleres extends Component {
                     <Navigation />
                     <div className="containerList">
                         <br/>
-                        <Button size="sm" color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFile}/> Nuevo Taller</Button>
+                        <Button  color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFile}/> Nuevo Taller</Button>
                         <br/>
                           
                         <br/>
@@ -706,7 +745,7 @@ class AdminTalleres extends Component {
                                     {
                                         icon:()=><a className="btn btn-danger btn-sm" size="sm"><FontAwesomeIcon icon={faTrash}/></a>,
                                         tooltip:'Eliminar Taller',
-                                        onClick:(event, rowData)=>this.deleteTaller(rowData._id, rowData.image,rowData.video, rowData.title)
+                                        onClick:(event, rowData)=>this.validarEliminacion(rowData._id, rowData.image,rowData.video, rowData.title)
                                     },
                                       {
                                         icon:()=><span className="btn btn-success btn-sm" ><FontAwesomeIcon icon={faFileExcel}/> Exportar</span>,
@@ -840,15 +879,25 @@ class AdminTalleres extends Component {
                                 </Row>
                             </div>               
                             <ModalBody>
-                                <h6>Registre sus preguntas</h6>
-                                <form onSubmit={this.addPregunta} className="container border p-3">
-                
+                               
+                                <form onSubmit={this.addPregunta} className="container  p-3" style={{border: '3px solid rgba(0, 0, 255, 0.1)'}}>
+                                      <h6>Registre sus preguntas</h6>
                                     <Row>
                                         <Col xs="12">
+                                                  
                                         <Row>               
-                                            <Col xs="7">
+                                            <Col xs="8" className="my-2">
                                             <textarea type="text" name="pregunta" onChange={this.handleChange} value={this.state.pregunta} className="form-control form-control-sm" placeholder="Ingrese la pregunta" required/>   
                                             </Col>
+                                            <Col xs="4" className="my-2">
+                                             <select name="tipo_preg" className="form-control" onChange={this.handleChange} value={this.state.tipo_preg}>
+                                                    <option value="1">Respuesta Unica</option>
+                                                    <option value="2">Respuesta Multiple</option>
+                                            </select>
+                                            </Col>
+                                            
+                                        </Row>
+                                        <Row>
                                             <Col xs="2">  
                                             <input type='number' name='puntaje' onChange={this.handleChange} value={this.state.puntaje} className="form-control form-control-sm" placeholder="Puntaje" required/>                             
                                             </Col>
@@ -865,20 +914,20 @@ class AdminTalleres extends Component {
                                                 <option>Seleccione una Pregunta</option>
                 
                                                 {
-                    this.state.preguntas_taller.map(data => {
+                                                    this.state.preguntas_taller.map(data => {
                                                         return(
                                                                         <option key={data._id} value={data._id}>{data.pregunta} {'    / Puts: '} {data.puntaje}</option>
-                                );
+                                                        );
                                                     })
                                                 }
                                             </select>                                    
                                             </Col>                                      
-                                            <Col xs="2"  className="mt-2">                                      
+                                            <Col xs="2"  className="mt-2 text-right">                                      
                                             <Button size="sm" color="warning" onClick={() => {
                         this.editPregunta(this.state.pregunta_id)
                                                 }}><FontAwesomeIcon icon={faEdit}/></Button>  {' '}
                                             <Button size="sm" color="danger" onClick={() => {
-                        this.deletePregunta(this.state.pregunta_id)
+                        this.validarEliminacionPreg(this.state.pregunta_id)
                                                 }}><FontAwesomeIcon icon={faTrash}/></Button> 
                                             </Col>                                      
                                         </Row>
@@ -887,12 +936,13 @@ class AdminTalleres extends Component {
                                 </form>
                 
                                 <hr/>
+                                
+                                <form onSubmit={this.addRespuesta} className="container p-3" style={{border: '3px solid rgba(60, 179, 113, 0.3)'}}>
                                 <h6>Registre sus respuestas</h6>
-                                <form onSubmit={this.addRespuesta} className="container border p-3">
                                     <Row>
                                         <Col xs="12">                
                                         <Row>
-                                            <Col xs="10">
+                                            <Col xs="12">
                                             <select  name="pregunta_resp" onChange={this.handleChangeSelect} value={this.state.pregunta_resp} className="form-control form-control-sm">
                                                 <option>Seleccione una Pregunta</option>                                  
                                                 {
@@ -904,8 +954,7 @@ class AdminTalleres extends Component {
                                                 }
                                             </select> 
                                             </Col>
-                                            <Col xs="2">
-                                            </Col>
+                                          
                                         </Row>
                                         <Row className="mt-2">               
                                             <Col xs="9">
@@ -915,7 +964,7 @@ class AdminTalleres extends Component {
                                             <Col xs="1">              
                                             <input type="checkbox" name="estadoresp" onChange={this.handleChange} checked={this.state.estadoresp} className="form-control form-control-sm"/> 
                                             </Col>
-                                            <Col xs="2"> 
+                                            <Col xs="2" className="text-right"> 
                                             <Button size="sm" color="primary"><FontAwesomeIcon icon={faSave}/> {this.state.btnCreaResp}</Button>               
                                             </Col>
                                         </Row>

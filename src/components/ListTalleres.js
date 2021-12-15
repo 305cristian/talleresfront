@@ -40,11 +40,24 @@ class ListTalleres extends Component {
     }
 
     componentDidMount() {
+        this.visitas();
         if (!cookies.get('nombre')) {
             window.location.href = '/';
         }
         this.getTaller();
     }
+    visitas(){
+        const{match} = this.props;
+        const id_ar = match.params.id_ar;
+        const datos={id_area:`${id_ar}`};
+        
+        axios.post(`${REACT_APP_HOST}/api/visitaslike`,datos).then( (response)=> {
+            if(response.data){
+                console.log('visita registrada');
+            }
+        });
+    }
+    
     getTaller() {
         const{match} = this.props;
         const id_ar = match.params.id_ar;

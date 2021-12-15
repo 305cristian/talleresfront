@@ -67,7 +67,7 @@ class AdminAreas extends Component {
             img_temp:'',
             image: '',
             aux:'',
-            errors: {}
+            errors: {},
 
         }
 
@@ -162,8 +162,24 @@ class AdminAreas extends Component {
             console.log(this.state.image)
         })
     }
+    
+    validarEliminacion(id_area, image){
+        axios.get(`${REACT_APP_HOST}/api/talleres/` + id_area+'/0').then( (response)=> {
+            if(response.data==='no_existe'){
+              this. deleteArea(id_area, image);
+            }else if(response.data ==='existe'){
+             Swal({
+                title: '!Atención',
+                text:'Esta Area tiene talleres registrados, imposible eliminar',
+                icon: 'warning',
+                button: true
+           });
+            }
+        });
+    }
 
     deleteArea(id, image) {
+            
          this.setState({img_temp:image});
         Swal({
             title: 'Esta seguro de eliminar el Area',
@@ -173,6 +189,7 @@ class AdminAreas extends Component {
             dangerMode: true
         }).then((value) => {
             if (value) {
+                
                 axios.delete(`${REACT_APP_HOST}/api/areas/` + id).then(async(response) => {
                     console.log(response.data);
                      let eliminar = await this.deleteImage();
@@ -186,6 +203,8 @@ class AdminAreas extends Component {
                 });
             }
         });
+        
+    
     }
 
     showModal() {
@@ -261,7 +280,7 @@ class AdminAreas extends Component {
                     <Navigation />
                     <div className="containerList">
                         <br/>
-                        <Button color="primary" onClick={this.showModal}>Nueva Area</Button>
+                        <Button color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFile}/> Nueva Area</Button>
                         <br/>
                          
                         <br/>
@@ -285,7 +304,7 @@ class AdminAreas extends Component {
                                     {
                                        icon:()=><span className="btn btn-danger btn-sm"><FontAwesomeIcon icon={faTrash}/></span>,
                                         tooltip:'Eliminar Area',
-                                        onClick:(event, rowData)=>this.deleteArea(rowData._id, rowData.image)
+                                        onClick:(event, rowData)=>this.validarEliminacion(rowData._id, rowData.image)
                                     },
                                     {
                                         icon:()=><span className="btn btn-success btn-sm" ><FontAwesomeIcon icon={faFileExcel}/> Exportar</span>,

@@ -12,9 +12,6 @@ import Cookies from 'universal-cookie';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
 import {faPenAlt}from '@fortawesome/free-solid-svg-icons'
 
-import ShakaPlayer from 'shaka-player-react';
-import 'shaka-player/dist/controls.css';
-
 
 const cookies = new Cookies();
 //import Styles from '../index.css'
@@ -47,10 +44,19 @@ function Presentacion() {
             });
         }
         obtenertaller();
+        visitas();
     }, [id]);
 
 
-
+    const visitas=()=>{
+        const datos={id_taller:`${id}`};
+        
+        axios.post(`${REACT_APP_HOST}/api/visitastaller`,datos).then( (response)=> {
+            if(response.data){
+                console.log('visita registrada');
+            }
+        });
+    }
     const evalEnable = (e) => {
         setstatusBoton(true);
     }
@@ -111,12 +117,12 @@ function Presentacion() {
                                     <CardHeader><div className="pl-2"><CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle></div></CardHeader>
                                     <CardBody><div className="pl-2"><CardText>{taller.description}</CardText></div></CardBody>
                                     <div className="pl-2 pb-2 text-center">
-                                        <Link to={`/evaluacion/${id}`}target="_blank"><Button disabled={value} color="success">Evaluacion</Button></Link>
+                                        <Link to={`/evaluacion/${id}`}target="_blank"><Button disabled={value} color="success"><FontAwesomeIcon icon={faPenAlt}/> Evaluacion</Button></Link>
                                     </div>
                                     </Card>
                     
                                 </div><br/>
-                                <div  className="col-md-8 text-center">
+                                <div  className="col-md-8 text-center text-white">
                     
                                     <h1>No hay Presentacion Registrada</h1>
                     

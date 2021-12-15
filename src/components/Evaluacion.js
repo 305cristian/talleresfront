@@ -4,7 +4,7 @@ import {render}from 'react-dom';
 import{Link, useParams} from'react-router-dom';
 import axios from'axios';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import {faChevronCircleRight, faFeatherAlt, faClock}from '@fortawesome/free-solid-svg-icons'
+import {faChevronCircleRight, faFeatherAlt, faClock, faCheckCircle, faSkull, faMailBulk, faFileAlt, faClipboard}from '@fortawesome/free-solid-svg-icons'
 import 'bootstrap/dist/css/bootstrap.css';
 import Swal from 'sweetalert';
 //import '../libraries/back';
@@ -53,6 +53,7 @@ class Evaluacion extends Component {
             deshabilitar: false,
             modalOpen: false,
             intentos: '',
+            respuestas_pint:[]
         }
         this.cargarSegundos = this.cargarSegundos.bind(this);
         this.cargarMinutos = this.cargarMinutos.bind(this);
@@ -102,8 +103,15 @@ class Evaluacion extends Component {
         this.state.preguntas_respuestas.map((preguntaAct, numPregunta) => {
             const respuestas = [];
             preguntaAct.respuestas.map((respuestaAct, numRespuesta) => {
-                respuestas.push(
+                
+                //VERIFICO SI LA PREGUNTA ES DE TIPO RADIO O CHECK 1=RADIO, 2=CHEACK
+                if(preguntaAct.tipo_preg==='1'){
+                     respuestas.push(
                         `<label><input type="radio"  name="${numPregunta}" value="${respuestaAct.respuesta}"/> ${respuestaAct.respuesta}</label><br/> `
+                        );
+                }else if (preguntaAct.tipo_preg==='2')
+                respuestas.push(
+                        `<label><input type="checkbox"  name="${numPregunta}" value="${respuestaAct.respuesta}"/> ${respuestaAct.respuesta}</label><br/> `
                         );
                 //Voy almacenando la respuestas correctas de cada pregunta
                 if (respuestaAct.estadoresp === true) {
@@ -153,17 +161,28 @@ class Evaluacion extends Component {
         this.state.preguntas_respuestas.map((preg_respAct, indexPreg) => {
             const resp_x_preguntas = respuestas[indexPreg];//agarro todos los input radio de la pregunta
             const checkSelect = `input[name='${indexPreg}']:checked`; //agarro el input radio seleccionado
-            const resp_elegida = (resp_x_preguntas.querySelector(checkSelect) || {}).value; // de todas las resp_x_preguntas escogeme el chequeado
+            const resp_elegida = (resp_x_preguntas.querySelector(checkSelect)||{}).value; // de todas las resp_x_preguntas escogeme el chequeado
 //            alert(resp_elegida + ':  ' + resp_correcta[indexPreg]);
             if (resp_elegida !== undefined) {
-                if (resp_elegida === resp_correcta[indexPreg]) {
+                var preg_incorrecta=false;//ESTA VARIABLE SIRVE PARA PINTAR LAS INCORRECTAS CUANDO ESTA EN ESTADO TRUE QUIERE DECIR QUE LA RESPUESTA DE LA PREGUNTA FUE INCORRECTA I AGO UN cont_incorrectas++;
+              for(var resp of preg_respAct.respuestas){
+//                  if (resp_elegida === resp_correcta[indexPreg]) {
+                if (resp_elegida === resp.respuesta && resp.estadoresp===true) {
+                    preg_incorrecta=false;//CON ESTO ME SERSIORO QUE SI TENGO UNA RESPUESTA CORRECTA NO ME SUME UNA INCORRECTA
                     cont_correctas++;
                     sum_pts = this.sumarPuntaje(indexPreg);
-                    this.pintarRespuestas(indexPreg, resp_correcta[indexPreg],preg_respAct._id, resp_elegida,estado_resp='1');
+                    this.get_respuestas_pint(indexPreg, preg_respAct._id, resp_elegida,estado_resp='1');
+                    break;
                 } else {
+                    preg_incorrecta=true;
+                } 
+
+               }
+               if(preg_incorrecta===true){                  
                     cont_incorrectas++;
-                    this.pintarRespuestas(indexPreg, resp_correcta[indexPreg],preg_respAct._id, resp_elegida, estado_resp='0');
-                }
+                    this.get_respuestas_pint(indexPreg, preg_respAct._id, resp_elegida, estado_resp='0');
+               }
+//                
 
             } else {
                 estado = false;
@@ -197,8 +216,8 @@ class Evaluacion extends Component {
         punt = sum_pts * 10 / acmd;
         puntuacion = Math.round(punt);
 
-        console.log(preguntas_eval);
-        console.log(respuestas_eval);
+//        console.log(preguntas_eval);
+//        console.log(respuestas_eval);
     }
 
     sumarPuntaje(index) {
@@ -206,31 +225,53 @@ class Evaluacion extends Component {
         pts += a;
         return pts;
     }
-    pintarRespuestas(indexResp, resp_Correcta, id_preg, resp, estado_resp) {
-//        console.log('id_pregunta', id_preg);
-//        console.log('resp', resp);    
+    
+    get_respuestas_pint(indexPreg, id_preg, resp, estado_resp){
+         axios.get(`${REACT_APP_HOST}/api/respuestas/` + id_preg+'/'+0+'/'+0).then((response) => {
+             if(response.data){
+                this.setState({respuestas_pint:response.data})
+                this.pintarRespuestas(indexPreg, id_preg, resp, estado_resp);
+             }
+         })
+      
+    }
+    
+    pintarRespuestas (indexPreg, id_preg, resp, estado_resp) {
+//        console.log('respuesta: ', resp);
         preguntas_eval.push(id_preg);//Almaceno las preguntas para el reporte de resultados
         respuestas_eval.push(resp);//Almaceno las respuestas para el reporte de resultados
         estado_resp_eval.push(estado_resp);//Almaceno el estado de las respuestas 1= si es la respuesta correcta, 2= si es la respuesta incorrecta para el reporte de resultados
         
-        const radios = document.getElementsByName(indexResp);
+        const radios = document.getElementsByName(indexPreg);
         for (var i = 0; i < radios.length; i++) {
             var radioCheckeado = radios[i].checked;
             if (radioCheckeado === true) {
                 var respCheackeado = radios[i].value;
 //                var labelRadio = document.querySelector(`${indexResp}`).parentNode;
-                const labelRadio = document.querySelector(`input[name="${indexResp}"]:checked`).parentNode;//Accede a los radios que tengan el nombre indexResp, verifica el que esta checheado y traeme el elemento padre
-                if (respCheackeado === resp_Correcta) {
+                
+                const labelRadio = document.querySelector(`input[name="${indexPreg}"]:checked`).parentNode;//Accede a los radios que tengan el nombre indexResp, verifica el que esta checheado y traeme el elemento padre
+                var preg_incorrecta=false;
+               for(var resp  of this.state.respuestas_pint) { 
+                    if (respCheackeado === resp.respuesta && resp.estadoresp===true) {
+                    preg_incorrecta=false;
+//                    console.log('---------- '+resp.respuesta);
                     labelRadio.style.color = 'green';
                     labelRadio.classList.add('font-weight-bold')
 //                    labelRadio.classList.add('bg-success');
 //                    labelRadio.classList.add('p-1');
+                    break;
                 } else {
+//                    console.log('.... '+resp.respuesta);
+                    preg_incorrecta=true;                  
+                }
+                
+                if(preg_incorrecta){
                     labelRadio.style.color = 'red';
                     labelRadio.classList.add('font-weight-bold');
 //                    labelRadio.classList.add('p-1');
-
                 }
+                }
+                
             }
         }
     }
@@ -426,29 +467,31 @@ class Evaluacion extends Component {
                                     <div className="container col-md-7 border p-4 my-5">
                                         <form >
                                             <div  className="bg-success container text-center p-1">
-                                                <label className="font-weight-bold text-white">Respuestas Correctas: <span>{cont_correctas}</span></label>
+                                                <label className="font-weight-bold text-white"><FontAwesomeIcon icon={faCheckCircle} size="2x"/> Respuestas Correctas: <span>{cont_correctas}</span></label>
                                             </div>
                                 
                                             <div  className="bg-danger container text-center p-1 my-2">
-                                                <label className="font-weight-bold text-white">Respuestas Incorrectas: <span>{cont_incorrectas}</span></label>
+                                                <label className="font-weight-bold text-white"><FontAwesomeIcon icon={faSkull} size="2x"/> Respuestas Incorrectas: <span>{cont_incorrectas}</span></label>
                                             </div>
                                 
                                             <div  className="bg-primary container text-center p-1 my-2">
                                                 <div>
-                                                    <label className="font-weight-bold text-white">Su Puntuación es: <span>{puntuacion}/10</span></label>                
+                                                    <label className="font-weight-bold text-white"><FontAwesomeIcon icon={faClipboard} size="2x"/> Su Puntuación es: <span>{puntuacion}/10</span></label>                
                                                 </div>
 
-                                                {cookies.get('rol')==='ADMINISTRADOR'?
-                                                <div>
-                                                    <a className='mano text-white' onClick={this.showModalResp}  style={{fontSize: 13}}>Ver Respuestas</a>              
-                                                </div>
-                                                :''}
+                                               
                                             </div>
                                 
-                                            <div  className=" container text-center p-1 my-2">
-                                                <Button size="xs" color='primary' onClick={() => {
-                                            this.sendResp(puntuacion)
-                                        }}>Enviar Resultados</Button>
+                                            <div  className="col-md-12 container text-center p-1 my-2 d-flex">
+                                                <div  className="col-md-6">
+                                                    {cookies.get('rol')==='ADMINISTRADOR'?
+                                                           <a className='mano btn btn-info' onClick={this.showModalResp}  style={{fontSize: 13}}><FontAwesomeIcon icon={faFileAlt} size="2x"/><span className="font-weight-bold"> Ver Respuestas</span></a>              
+                                                    :''}
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <Button size="xs" color='primary' onClick={() => { this.sendResp(puntuacion)}}><FontAwesomeIcon icon={faMailBulk} size="2x"/> <span className="font-weight-bold">Enviar Resultados</span></Button>                                                  
+                                                    
+                                                </div>
                                             </div>
                                         </form>
                                 
@@ -463,7 +506,7 @@ class Evaluacion extends Component {
                                 <h3 className='p-2 pl-3'><FontAwesomeIcon icon={faFeatherAlt}/> Respuestas Correctas</h3>               
                             </div>
                             <div className='col-md-1 my-2'>
-                                <Button size='sm' onClick={() => {
+                                <Button size='sm' color="danger" onClick={() => {
                         this.hideModal()
                     }}>X</Button>                
                             </div>

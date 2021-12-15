@@ -10,7 +10,7 @@ import Breadcrumb_nav from '../components/Breadcrumb_nav';
 
 import Cookies from 'universal-cookie';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import {faChartPie, faStepBackward,faLayerGroup, faFileSignature}from '@fortawesome/free-solid-svg-icons'
+import {faChartPie, faStepBackward,faLayerGroup, faFileSignature,faEye,faListOl}from '@fortawesome/free-solid-svg-icons'
 
 
 const cookies = new Cookies();
@@ -30,7 +30,10 @@ export default class ListAreas extends Component {
     constructor() {
         super();
         this.state = {
-            areas: []
+            areas: [],
+            visitas:[],
+            visitas_taller:[],
+            preguntas_fallidas:[]
         }
     }
 
@@ -39,6 +42,28 @@ export default class ListAreas extends Component {
             window.location.href = '/'
         }
         this.getTalleres();
+        this.getVisitas();
+        this.getVisitas_taller();
+        this.getPreguntasFallidas();
+    }
+    
+    getVisitas() {
+        axios.get(`${REACT_APP_HOST}/api/visitaslike`).then(response => {
+            this.setState({visitas: response.data})
+        })
+
+    }
+    getVisitas_taller() {
+        axios.get(`${REACT_APP_HOST}/api/visitastaller`).then(response => {
+            this.setState({visitas_taller: response.data})
+        })
+
+    }
+    getPreguntasFallidas() {
+        axios.get(`${REACT_APP_HOST}/api/resultados`).then(response => {
+            this.setState({preguntas_fallidas: response.data})
+        })
+
     }
     getTalleres() {
         axios.get(`${REACT_APP_HOST}/api/areas`).then(response => {
@@ -82,6 +107,7 @@ export default class ListAreas extends Component {
                                                                         </div>
 
                                                                         <div className="card-front__bt">
+                                                                            
                                                                             <p className="card-front__text-view card-front__text-view--dark">
                                                                                 Ver mas
                                                                             </p>
@@ -125,9 +151,38 @@ export default class ListAreas extends Component {
                                                             <CardTitle className="font-weight-bold" tag="h5">Estadistica <FontAwesomeIcon icon={faChartPie}/></CardTitle>
                                                         </CardHeader>
                                         
-                                                        <CardBody className="text-center">
-                                                            <CardText>En Construccion</CardText>
-                                                            
+                                                        <CardBody >
+                                                             <CardText className="font-weight-bold text-danger">Preguntas mas Fallidas</CardText>
+                                                            {
+                                                            this.state.preguntas_fallidas.map((data, index)=>(
+                                                                    <ul key={data._id}>
+                                                                        <i className="font-weight-bold text-danger">{data.preguntas_get.pregunta}{' '} <span className="badge bg-dark text-white"><FontAwesomeIcon icon={faListOl}/> {data.cont}</span></i>
+                                                                    </ul>
+                                                            ))
+                                                           
+                                                            }
+                                                            <hr/>
+                                                            <CardText className="font-weight-bold">Visitas a Areas</CardText>
+                                                            {
+                                                            this.state.visitas.map((data, index)=>(
+                                                                    <ul key={data._id}>
+                                                                        <i className="font-weight-bold">{data.talleresArea.title}{' '}<span className="badge bg-dark text-white"><FontAwesomeIcon icon={faEye}/> {data.visitas}</span></i>
+                                                                    </ul>
+                                                            ))
+                                                           
+                                                            }
+                                                            <hr/>
+                                                            <CardText className="font-weight-bold">Visitas a Talleres</CardText>
+                                                            {
+                                                            this.state.visitas_taller.map((data, index)=>(
+                                                                    <ul key={data._id}>
+                                                                        <i className="font-weight-bold">{data.talleres.title}{' '}<span className="badge bg-dark text-white"><FontAwesomeIcon icon={faEye}/> {data.visitas}</span></i>
+                                                                    </ul>
+                                                            ))
+                                                           
+                                                            }
+           
+                                                           
                                                         </CardBody>
                                                         </Card>
                         </div>
