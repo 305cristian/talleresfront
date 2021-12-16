@@ -30,19 +30,20 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
     "reactstrap": "^8.9.0",
+    "serve": "^13.0.2",
     "sweetalert": "^2.1.2",
     "universal-cookie": "^4.0.4",
     "web-vitals": "^1.1.0",
     "xlsx": "^0.17.4"
   },
-    "scripts": {
+  "scripts": {
     "dev": "react-scripts start",
     "start": "serve -s build",
     "build": "react-scripts build",
     "test": "react-scripts test --env = jsdom ",
-    " eject " :" react-scriptseject ",
-     " heroku-postbuild ":" npm run build "
-    },
+    " eject ": " react-scriptseject ",
+    " heroku-postbuild ": " npm run build "
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
