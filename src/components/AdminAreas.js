@@ -222,9 +222,10 @@ class AdminAreas extends Component {
     }
     
      uploadImage = async() => {
-        var storageRef = storage.ref();
+        var storageRef = storage.ref();       
         var spaceRef = storageRef.child(`images/imgareas/${this.state.image.name}`);
-        return await spaceRef.put(this.state.image)
+         console.log(spaceRef);
+        return await spaceRef.put(this.state.image);
 
     }
     deleteImage = async() => {
