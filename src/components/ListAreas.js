@@ -115,7 +115,7 @@ export default class ListAreas extends Component {
                                                                     </div>
 
                                                                     <div className="card-back">
-                                                                    <CardImg className="image"  src={`${REACT_APP_PATCH}imgareas%2F${area.image}?alt=media`} alt="Card image cap" /> 
+                                                                    <CardImg src={`${REACT_APP_PATCH}imgareas%2F${area.image}?alt=media`} alt="Card image cap" /> 
 
                                                                     </div>
                                                                 </div>
