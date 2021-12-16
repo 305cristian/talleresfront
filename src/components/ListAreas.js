@@ -155,7 +155,7 @@ export default class ListAreas extends Component {
                                                              <CardText className="font-weight-bold text-danger">Preguntas mas Fallidas</CardText>
                                                             {
                                                             this.state.preguntas_fallidas.map((data, index)=>(
-                                                                    <ul key={data._id}>
+                                                                    <ul key={data.preguntas_get._id}>
                                                                         <i className="font-weight-bold text-danger">{data.preguntas_get.pregunta}{' '} <span className="badge bg-dark text-white"><FontAwesomeIcon icon={faListOl}/> {data.cont}</span></i>
                                                                     </ul>
                                                             ))

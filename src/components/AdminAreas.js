@@ -17,8 +17,9 @@ import XLSX from 'xlsx'
 
 const cookies = new Cookies();
 
-const {REACT_APP_HOST} = process.env;
-var storage = firebase.app().storage("gs://talleres-1b6d0.appspot.com");
+const {REACT_APP_HOST, REACT_APP_STORAGE} = process.env;
+
+var storage = firebase.app().storage(`${REACT_APP_STORAGE}`);
 
 const validation = data => {
     const errors = {};

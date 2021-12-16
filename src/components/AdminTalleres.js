@@ -22,7 +22,7 @@ import XLSX from 'xlsx'
 
 
 const cookies = new Cookies();
-const {REACT_APP_HOST} = process.env;
+const {REACT_APP_HOST, REACT_APP_STORAGE} = process.env;
 
 const paginacion={
                                         labelRowsSelect:'Filas',
@@ -67,7 +67,7 @@ const validation = data => {
 var prueba_regis = [];
 var array = [];
 
-var storage = firebase.app().storage("gs://talleres-1b6d0.appspot.com");
+var storage = firebase.app().storage(`${REACT_APP_STORAGE}`);
 
 
 class AdminTalleres extends Component {
