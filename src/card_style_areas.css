@@ -134,7 +134,7 @@ html { font-size: 90%; }
 
 /* Area to hold an individual card */
 .card-section {
-  align-items: center;
+  /*align-items: center;*/
   display: flex;
   height: 100%;
   justify-content: center;

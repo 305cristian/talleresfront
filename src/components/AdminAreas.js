@@ -276,7 +276,7 @@ class AdminAreas extends Component {
 
         const {errors} = this.state;
         return (
-                <div>
+                <div className="container-fluid">
                     <Navigation />
                     <div className="containerList">
                         <br/>
