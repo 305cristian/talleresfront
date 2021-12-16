@@ -7,7 +7,7 @@ html { font-size: 90%; }
 
 /* Main heading for card's front cover */
 .card-front__heading {
-  font-size: 1.5rem;
+  font-size: 1rem;
   margin-top: .25rem;
 }
 

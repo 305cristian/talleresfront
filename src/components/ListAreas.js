@@ -100,9 +100,9 @@ export default class ListAreas extends Component {
                                                                                         <p className="card-front__text-price">
                                                                                           <FontAwesomeIcon icon={faFileSignature} size="2x"/>
                                                                                        </p>
-                                                                                       <h2 className="card-front__heading">
-                                                                                           <CardTitle className="font-weight-bold" >{area.title} </CardTitle>
-                                                                                       </h2>
+                                                                                       <h5 className="card-front__heading">
+                                                                                           <p className="font-weight-bold" >{area.title} </p>
+                                                                                       </h5>
                                                                                       
                                                                         </div>
 
