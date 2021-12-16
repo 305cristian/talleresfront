@@ -145,8 +145,7 @@ class ListTalleres extends Component {
                                                             
                                                                 <div className="col-md-3" key={taller._id} style={styles.div}>
                                                                     {taller.estado === '1' ?
-                                                                  
-                                                                                                  <div className="container">
+                                                                                         <div className="container">
                                                                                                         <div className="cardd">
                                                                                                             <div className="face face1">                                                                                                                                                                                                                                                                                                                               
                                                                                                                 <div className="content">                                                                                                                                                          
