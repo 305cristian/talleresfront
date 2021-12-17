@@ -12,7 +12,7 @@ import "firebase/firestore";
 
 // TODO: Replace the following with your app's Firebase project configuration
 // For Firebase JavaScript SDK v7.20.0 and later, `measurementId` is an optional field
-//const firebaseConfig = {
+const firebaseConfig = {
 //  apiKey: "AIzaSyCTJqBSsSxuEDW9lYVljq5wYHjs0ln2RBA",
 //  authDomain: "training-c918f.firebaseapp.com",
 //  projectId: "training-c918f",
@@ -20,7 +20,7 @@ import "firebase/firestore";
 //  messagingSenderId: "25918990019",
 //  appId: "1:25918990019:web:c496091fe6f5eac4576476",
 //  measurementId: "G-5WVPJ4J37M"
-//};
+};
 
 //PARA PRODUCCION
 const firebaseConfig = {
