@@ -94,7 +94,16 @@ function Presentacion() {
                                     playing={true}
                                     onEnded={evalEnable}
                                     onPlay={evalDisable}
-                                    
+                                    config={{
+                                        file: {
+                                            attributes: {
+                                                disablePictureInPicture: "false",
+                                                controlsList: 'nodownload  noplaybackrate',
+
+
+                                            }
+                                        }
+                                    }}
                                     />
                                     
                     
