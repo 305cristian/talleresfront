@@ -98,7 +98,7 @@ function Presentacion() {
                                         file: {
                                             attributes: {
                                                 disablePictureInPicture: "false",
-                                                controlsList: 'nodownload  noplaybackrate',
+                                                controlsList: 'nodownload  noplaybackrate'
 
 
                                             }

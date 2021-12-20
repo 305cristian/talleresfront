@@ -2,7 +2,7 @@ import React, {Component}from 'react';
 import{Link} from'react-router-dom';
 import {render}from'react-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faHeadset, faUserTie, faFeatherAlt} from '@fortawesome/free-solid-svg-icons';
+import {faHeadset, faUserTie, faFeatherAlt,faHome,faChartLine, faUsers,faClone, faLayerGroup,faCogs, faHistory} from '@fortawesome/free-solid-svg-icons';
 import Cookies from 'universal-cookie';
 import {Modal, Button, Dropdown, DropdownToggle, DropdownMenu, DropdownItem}from'reactstrap';
 
@@ -62,7 +62,7 @@ export default class Navigation extends Component {
         return(
                 <div>
                     <nav className="navbar navbar-expand-lg navbar-light bg-dark">
-                        <Link className="navbar-brand text-white" to="/home"><FontAwesomeIcon icon={faFeatherAlt}/> TALLERES BY CC</Link>
+                        <Link className="navbar-brand text-white" to="/home"><FontAwesomeIcon icon={faFeatherAlt} size="lg"/> <span style={{fontSize:'21px'}}>TALLERES BY CC</span></Link>
                         <button id="btn" className="navbar-toggler bg-white" type="button" onClick={()=>{this.hidden()}} data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon"></span>
                         </button>
@@ -70,38 +70,38 @@ export default class Navigation extends Component {
                             <ul className=" navbar-nav">
                             
                                 <li className="nav-item active">
-                                    <Link className="nav-link text-white" to="/home">Home</Link>
+                                    <Link className="nav-link text-white" to="/home"><FontAwesomeIcon icon={faHome}/> Home </Link>
                                 </li>
                                 
                                 {cookies.get('rol')=='ADMINISTRADOR'?
                                 <li className="nav-item">
-                                    <Link className="nav-link text-white"  to="/adminTask">Talleres</Link>
+                                    <Link className="nav-link text-white"  to="/adminTask"><FontAwesomeIcon icon={faLayerGroup} /> Talleres </Link>
                                 </li>
                                 :''}
                                 
                                 {cookies.get('rol')=='ADMINISTRADOR'?
                                 <li className="nav-item">
-                                    <Link className="nav-link text-white"  to="/adminAreas">Areas</Link>
+                                    <Link className="nav-link text-white"  to="/adminAreas"><FontAwesomeIcon icon={faClone}/> Areas </Link>
                                 </li>
                                  :''}
                                  
                                 {cookies.get('rol')=='ADMINISTRADOR'?
                                 <li className="nav-item">
-                                    <Link className="nav-link text-white" to="/adminUsers">Users</Link>
+                                    <Link className="nav-link text-white" to="/adminUsers"><FontAwesomeIcon icon={faUsers} /> Users </Link>
                                 </li>
                                  :''}
                                 {cookies.get('rol')=='ADMINISTRADOR'?
                                 <li className="nav-item">
-                                    <Link className="nav-link text-white" to="/adminResultados">Resultados</Link>
+                                    <Link className="nav-link text-white" to="/adminResultados"><FontAwesomeIcon icon={faChartLine} /> Resultados </Link>
                                 </li>
                                  :''}
                                 {cookies.get('rol')=='ADMINISTRADOR'?
                                 <Dropdown isOpen={this.state.dropdownOpen_setting} toggle={() => {this.toggle_setting()}}>
                                     <DropdownToggle color='dark' caret >
-                                        <span>Settings</span>
+                                        <span><FontAwesomeIcon icon={faCogs} /> Settings</span>
                                     </DropdownToggle>
                                     <DropdownMenu>
-                                       <DropdownItem><Link className='text-dark text-decoration-none' to="/resetIntentos">Reset Intentos</Link></DropdownItem>                                        
+                                       <DropdownItem><Link className='text-dark text-decoration-none' to="/resetIntentos"><FontAwesomeIcon icon={faHistory}/> Reset Intentos</Link></DropdownItem>                                        
                                     </DropdownMenu>
                                     
                                 </Dropdown>

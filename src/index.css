@@ -149,3 +149,8 @@ border: 2px solid #ccc;
     max-width:75%;
     display:block;
 }
+
+audio::-webkit-media-controls-timeline,
+video::-webkit-media-controls-timeline {
+    display: none;
+}
