@@ -10,7 +10,7 @@ import Breadcrumb_nav from '../components/Breadcrumb_nav';
 
 import Cookies from 'universal-cookie';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import {faChartPie, faStepBackward,faLayerGroup, faFileSignature,faEye,faListOl}from '@fortawesome/free-solid-svg-icons'
+import {faChartPie, faStepBackward,faLayerGroup, faFileSignature,faEye,faListOl, faExclamationTriangle}from '@fortawesome/free-solid-svg-icons'
 
 
 const cookies = new Cookies();
@@ -68,8 +68,9 @@ export default class ListAreas extends Component {
     getTalleres() {
         axios.get(`${REACT_APP_HOST}/api/areas`).then(response => {
 //      axios.get('http://localhost:4000/api/talleres').then(response => {
-            console.log(response.data)
-            this.setState({areas: response.data})
+            if(response.data.length>0){
+                this.setState({areas: response.data}) 
+            }
 
         })
 
@@ -82,6 +83,7 @@ export default class ListAreas extends Component {
                 <div className="container-fluid">
                  <Navigation />
                 <div className="containerFluid2 mt-2 p-5 ">
+                {this.state.areas.length > 0 ?
                     <div className="row">
                     <div className="row col-md-9">
                 
@@ -188,7 +190,8 @@ export default class ListAreas extends Component {
                         </div>
                     </div>
                     </div>
-                 
+                                  : <h5 className="text-warning">! Atencion, Dasboard sin registrso, registre areas y talleres para empezar a usar la plataforma <FontAwesomeIcon icon={faExclamationTriangle}/></h5>}
+
                 </div>
                 </div>
                 )

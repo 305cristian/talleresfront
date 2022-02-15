@@ -6,7 +6,7 @@ import Navigation from '../components/Navigation';
 import axios from 'axios';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome';
-import {faCheckCircle, faExclamationCircle, faFileDownload, faTimesCircle}from '@fortawesome/free-solid-svg-icons';
+import {faCheckCircle, faExclamationCircle, faFileDownload, faTimesCircle,faExclamationTriangle}from '@fortawesome/free-solid-svg-icons';
 
 //Bootstrap and jQuery libraries
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -229,6 +229,7 @@ datatabla(){
         return(
                 <div>
                     <Navigation />
+                    {this.state.user_talleres.length>0 ?
                     <div className="containerList my-3" style={{overflowX: 'auto'}}> 
                         <h2>Resultados de los Talleres</h2>
                         
@@ -283,7 +284,7 @@ datatabla(){
                             </tbody>
                         </table>
                     </div>
-                    
+                : <h5 className="text-warning">! No se ha gerenado ninguna capacitacion para poder mostrar resultados <FontAwesomeIcon icon={faExclamationTriangle}/></h5>}  
                 <Modal isOpen={this.state.modalOpen} size='lg'>
                  <div className='p-2 border'>
                                 <Row>
