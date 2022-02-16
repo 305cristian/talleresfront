@@ -74,7 +74,7 @@ class ListTalleres extends Component {
         const id_user = cookies.get('id');
         axios.get(`${REACT_APP_HOST}/api/user_taller/${id_user}`).then((response) => {
             this.setState({user_talleres: response.data})
-            console.log(response.data)
+//            console.log(response.data)
             this.verificarCompletado();
         })
 
