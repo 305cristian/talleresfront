@@ -404,8 +404,7 @@ class Evaluacion extends Component {
                 for (var resp  of this.state.respuestas_pint) {
                     if (respCheackeado === resp.respuesta && resp.estadoresp === true) {
                         preg_incorrecta = false;
-//                        labelRadio.style.color = 'green';
-//                        labelRadio.style.fontWeight = 'bold';
+
                         labelRadio.classList.add("text-success", "font-weight-bold");
                         break;
                     } else {
@@ -413,13 +412,12 @@ class Evaluacion extends Component {
                         preg_incorrecta = true;
                     }
 
-                    if (preg_incorrecta) {
-//                        labelRadio.style.color = 'red';
-//                        labelRadio.style.fontWeight = 'bold';
-//                        labelRadio.classList.remove("text-dark");
+                   
+                }
+                 if (preg_incorrecta) {
+
                         labelRadio.classList.add("text-danger", "font-weight-bold");
                     }
-                }
 
             }
         }

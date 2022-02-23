@@ -142,6 +142,13 @@
     background: linear-gradient(#145BA8, #696A6B);   
 }
 
+.image_taller {
+    width: 500px;
+    height: 100px;
+    background-size: contain;
+    background: linear-gradient(#145BA8, #696A6B);   
+}
+
 main {
 border: 2px solid #ccc;
    

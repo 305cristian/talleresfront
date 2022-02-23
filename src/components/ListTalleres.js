@@ -7,7 +7,7 @@ import axios from 'axios';
 import{Link, useParams} from'react-router-dom';
 
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import {faCheckCircle, faExclamationCircle, faExclamationTriangle, faLock, faFileAlt, faPenAlt}from '@fortawesome/free-solid-svg-icons'
+import {faCheckCircle, faExclamationCircle, faExclamationTriangle, faLock, faFilm, faPenAlt}from '@fortawesome/free-solid-svg-icons'
 
 import Navigation from '../components/Navigation';
 import Breadcrumb_nav from '../components/Breadcrumb_nav';
@@ -148,8 +148,8 @@ class ListTalleres extends Component {
                                                                                          <div className="container">
                                                                                                         <div className="cardd">
                                                                                                             <div className="face face1">                                                                                                                                                                                                                                                                                                                               
-                                                                                                                <div className="content">                                                                                                                                                          
-                                                                                                                    <CardImg  top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
+                                                                                                                <div className="content  text-center">                                                                                                                                                          
+                                                                                                                    <CardImg className="image_taller"  top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
                                                                                                                     <h3><CardTitle className="font-weight-bold" >{taller.title}</CardTitle></h3>
                                                                                                                     <div className="text-center"><span className="badge bg-success text-white" style={{fontSize:'15px'}}>Completado <FontAwesomeIcon icon={faCheckCircle}/></span></div>
                                                                                                                 </div>
@@ -157,7 +157,7 @@ class ListTalleres extends Component {
                                                                                                         <div className="face face2">
                                                                                                             <div className="content">
                                                                                                                 <CardText>{taller.description}</CardText>
-                                                                                                                <Link to={`/culminado/${taller._id}/${taller.fecha}`} style={{color: "black", textDecoration: "none black"}}><span><FontAwesomeIcon icon={faPenAlt}/> Evaluación</span></Link>
+                                                                                                                <Link to={`/culminado/${taller._id}/${taller.fecha}`} style={{color: "black", textDecoration: "none black"}}><span><FontAwesomeIcon icon={faFilm}/> Ver Presentación</span></Link>
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     </div>
@@ -169,9 +169,9 @@ class ListTalleres extends Component {
                                                                                                         <div className="cardd">
                                                                                                             <div className="face face1">
 
-                                                                                                                <div className="content">
+                                                                                                                <div className="content  text-center">
 
-                                                                                                                    <CardImg className="image" top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
+                                                                                                                    <CardImg className="image_taller" top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
                                                                                                                     <h3><CardTitle className="font-weight-bold text-danger" >{taller.title}</CardTitle></h3>
                                                                                                                     <div className="text-center"><span className="badge bg-danger text-white" style={{fontSize:'15px'}}>Lock <FontAwesomeIcon icon={faLock}/></span></div>
                                                                                                                 </div>
@@ -179,7 +179,7 @@ class ListTalleres extends Component {
                                                                                                             <div className="face face2">
                                                                                                                 <div className="content">
                                                                                                                     <CardText className="text-danger">Taller Bloqueado por exceso de intentos, cominiquese con el administrador del sistema</CardText>
-                                                                                                                    <Link to={`#`} style={{color: "black", textDecoration: "none black"}}><span><FontAwesomeIcon icon={faPenAlt}/> Evaluación</span></Link>
+                                                                                                                    <Link to={`#`} style={{color: "black", textDecoration: "none black"}}><span><FontAwesomeIcon icon={faFilm}/> Ver Presentacion</span></Link>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                         </div>
@@ -189,9 +189,9 @@ class ListTalleres extends Component {
                                                                                                         <div className="cardd">
                                                                                                             <div className="face face1">
 
-                                                                                                                <div className="content">
+                                                                                                                <div className="content  text-center">
 
-                                                                                                                    <CardImg className="image" top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
+                                                                                                                    <CardImg className="image_taller" top width="100%" src={`${REACT_APP_PATCH}imgtaller%2F${taller.image}?alt=media`} alt="Card image cap" /> 
                                                                                                                     <h3><CardTitle className="font-weight-bold" >{taller.title}</CardTitle></h3>
                                                                                                                     <div className="text-center"><span className="badge bg-warning text-white" style={{fontSize:'15px'}}>En Curso <FontAwesomeIcon icon={faExclamationCircle}/></span></div>
                                                                                                                 </div>
@@ -199,7 +199,7 @@ class ListTalleres extends Component {
                                                                                                             <div className="face face2">
                                                                                                                 <div className="content">
                                                                                                                     <CardText>{taller.description}</CardText>
-                                                                                                                    <Link to={`/presentacion/${taller._id}`} style={{color: "black", textDecoration: "none black"}}><span><FontAwesomeIcon icon={faPenAlt}/> Evaluación</span></Link>
+                                                                                                                    <Link to={`/presentacion/${taller._id}`} style={{color: "black", textDecoration: "none black"}}><span><FontAwesomeIcon icon={faFilm}/> Ver Presentación</span></Link>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                         </div>
