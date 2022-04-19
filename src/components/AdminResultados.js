@@ -6,7 +6,7 @@ import Navigation from '../components/Navigation';
 import axios from 'axios';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome';
-import {faCheckCircle, faExclamationCircle, faFileDownload, faTimesCircle, faExclamationTriangle}from '@fortawesome/free-solid-svg-icons';
+import {faCheckCircle, faExclamationCircle, faFileDownload, faTimesCircle, faExclamationTriangle, faSearch}from '@fortawesome/free-solid-svg-icons';
 
 //Bootstrap and jQuery libraries
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -48,7 +48,9 @@ class AdminResultados extends Component {
 
             modalOpen_consolidadod: false,
             
-            taller:''
+            taller:'',
+            listaAreas:[],
+            area_id:'-1'
         }
 
 
@@ -56,6 +58,7 @@ class AdminResultados extends Component {
     }
     componentDidMount() {
         this.getTalleres();
+        this.showAreas();
         //initialize datatable
 
     }
@@ -65,6 +68,22 @@ class AdminResultados extends Component {
             this.setState({talleres: response.data})
             this.getUsuarios();
         })
+    }
+    
+    getTalleresXAreas(){
+        
+        if(this.state.area_id === '-1'){            
+            axios.get(`${REACT_APP_HOST}/api/talleres`).then((response) => {
+                this.setState({talleres: response.data})          
+            });
+        }else{
+            axios.post(`${REACT_APP_HOST}/api/talleres_ar/`+this.state.area_id).then(response => {
+            this.setState({talleres: response.data});
+//            console.log(response.data);
+            });         
+        }
+        
+         
     }
 
     getUsuarios() {
@@ -249,7 +268,25 @@ class AdminResultados extends Component {
     }
     // CIERRA MODAL CONSOLIDADO
 
-
+  async showAreas(){
+     
+     const response= await axios.get(`${REACT_APP_HOST}/api/areas`);
+     if(response){
+         this.setState({listaAreas:response.data});
+     }
+     
+  }
+  handleChange=(e)=> {
+//        console.log(e.target.value);
+        if (e.target.type === 'checkbox') {
+            var value = e.target.checked;
+            var name = e.target.name;
+        } else {
+            var {name, value} = e.target;
+        }
+//       
+        this.setState({[name]: value});
+    }
 
     render() {
 
@@ -258,8 +295,21 @@ class AdminResultados extends Component {
                     <Navigation />
                     {this.state.user_talleres.length > 0 ?
                                     <div className="containerList my-3" style={{overflowX: 'auto'}}> 
-                                        <h2>Resultados de los Talleres</h2>
-                                
+                                       
+                                        <div className=" container-fluid col-md-12 row my-2 justify-content-center">
+                                           
+                                                <select className="form-control col-md-4" onChange={this.handleChange} name="area_id" value={this.state.area_id}>
+                                                <option value="-1" >Todas las Áreas</option>
+                                                {
+                                                    this.state.listaAreas.map((data)=>(
+                                                            <option key={data._id}  value={data._id}>{data.title}</option>
+                                                    ))
+                                                }
+                                                </select>                                             
+                                          
+                                                  <Button onClick={()=>{this.getTalleresXAreas()}}><FontAwesomeIcon icon={faSearch}/> Filtrar Área</Button>
+                                           
+                                        </div>
                                         <table id='resultados' className='table table-nowrap' style={{fontSize: '15px'}}>
                                             <thead >
                                 
@@ -268,11 +318,11 @@ class AdminResultados extends Component {
                                                     <th></th>
                                                     <th></th>
                                                     {
-                                        this.state.talleres.map((data, index) => (
-                                                                                    <th key={data._id}><button className="btn btn-success btn-sm" onClick={() => {
-                                                                                            this.show_consolidado(data._id)
-                                                                                                            }}><FontAwesomeIcon icon={faFileDownload}/> Exportar</button></th>
-                                                    ))
+                                                        this.state.talleres.map((data, index) => (
+                                                            <th key={data._id}><button className="btn btn-success btn-sm" onClick={() => {
+                                                                    this.show_consolidado(data._id)
+                                                                                    }}><FontAwesomeIcon icon={faFileDownload}/> Exportar</button></th>
+                                                        ))
                                                     }
                                 
                                                 </tr>
@@ -281,8 +331,8 @@ class AdminResultados extends Component {
                                                     <th>USUARIO</th>
                                                     <th>CEDULA</th>
                                                     {
-                                        this.state.talleres.map((data, index) => (
-                                                                                    <th key={data._id}>{data.title}</th>
+                                                        this.state.talleres.map((data, index) => (
+                                                        <th key={data._id}>{data.title}</th>
                                                     ))
                                                     }
                                 
@@ -349,15 +399,23 @@ class AdminResultados extends Component {
                 
                 
                     <Modal isOpen={this.state.modalOpen_consolidadod} style={{maxWidth: '1300px', width: '100%'}} >
-                        <ReactHTMLTableToExcel
-                            id="btn-export-excel"
-                            className="btn btn-success"
-                            table="consolidado"
-                            filename="Consolidado de Respuestas"
-                            sheet="HOJA 1"
-                            buttonText="Descargar Archivo XLS"/>
+                        <div className="col-md-12 row"> 
+                        <div className="col-md-10 mt-2"> 
+                            <ReactHTMLTableToExcel
+                                id="btn-export-excel"
+                                className="btn btn-success"
+                                table="consolidado"
+                                filename="Consolidado de Respuestas"
+                                sheet="HOJA 1"
+                                buttonText="Descargar Archivo XLS"/>
+                        </div>  
+                        <div className="col-md-2 text-right"> 
+                            <div className="my-2 text-right"><Button color="danger" size="sm" onClick={() => { this.hideModal_consolidado(); }}><FontAwesomeIcon icon={faTimesCircle}/></Button> </div>                         
+                        </div>  
+                        </div>  
                         <ModalBody>
-                            <div className=" my-3" style={{overflowX: 'auto'}}>                         
+                        
+                            <div className=" my-3" style={{overflowX: 'auto'}}>                                            
                                 <table id='consolidado' className='table table-nowrap' style={{fontSize:'11px'}}>
                                     <thead className='bg-dark text-white' >
 

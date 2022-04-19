@@ -178,8 +178,8 @@ class AdminUsers extends Component {
                     });
                     this.getUsers();
 
-                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', aux: '', image: '...'})
-                })
+                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', user: '', pass: '', aux: '', image: '...'});
+                });
             }
 
         }
@@ -202,9 +202,9 @@ class AdminUsers extends Component {
                 textButton: 'ACTUALIZAR',
                 estado_update: true,
                 header: 'Actualizar Usuario'
-            })
+            });
 //            console.log(this.state.image)
-        })
+        });
     }
 
     validarEliminacion(id, image, nombre, apellido) {
@@ -253,7 +253,7 @@ class AdminUsers extends Component {
         this.setState({modalOpen: true});
     }
     hideModal() {
-        this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', modalOpen: false, textButton: 'REGISTRAR', header: 'Insertar Usuario', image: '...', errors: {}})
+        this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', modalOpen: false,estado_update: false, textButton: 'REGISTRAR', header: 'Insertar Usuario', image: '...', errors: {}})
     }
 
     showModalPass() {
