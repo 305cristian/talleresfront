@@ -5,7 +5,7 @@ import Swal from 'sweetalert';
 import axios from 'axios'
 import P from '../components/P';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import { faFileAlt, faEdit,faEye, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo, faFileExcel }from '@fortawesome/free-solid-svg-icons'
+import { faFileAlt, faEdit,faEye, faTrash,faBan, faFile,faBook, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo, faFileExcel }from '@fortawesome/free-solid-svg-icons'
 //import { faApple} from '@fortawesome/free-brands-svg-icons'
 
 import Navigation from '../components/Navigation';
@@ -700,10 +700,8 @@ class AdminTalleres extends Component {
                     <Navigation />
                     <div className="containerList">
                         <br/>
-                        <Button  color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFile}/> Nuevo Taller</Button>
-                        <br/>
-                          
-                        <br/>
+                        <Button  color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFileAlt}/> Nuevo Taller</Button>
+
                         
                         {this.state.talleres.length > 0 ?
                                 <DataTable
@@ -781,32 +779,48 @@ class AdminTalleres extends Component {
                             
                         <Modal isOpen={this.state.modalOpen}>
                             <ModalHeader>
-                                <div><h3>{this.state.header}</h3></div>
+                                <div><h3><FontAwesomeIcon icon={faBook}/> {this.state.header}</h3></div>
                             </ModalHeader>
                 
                             <ModalBody>
                                 <form onSubmit={this.addTaller} className="container">
                                     <div className="row py-2">
+                                    
+                                    <InputGroup className="my-1" >
+                                        <InputGroupText>
+                                            Área
+                                        </InputGroupText>
                                         <select  name="area_id" onChange={this.handleChange} value={this.state.area_id} className="form-control">
                                             <option>Seleccione una Area</option>
                                             {
-                    this.state.areas.map(data => {
+                                                this.state.areas.map(data => {
                                                     return(
                                                                     <option key={data._id} value={data._id}>{data.title}</option>
-                                );
+                                                );
                                                 })
                                             }
                                         </select>
+                                    </InputGroup> 
                                         {errors.area_id && <P errors={errors.area_id} />}
                                     </div>
                                     <div className="row py-2">
-                                        <input name="title" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Title" value={this.state.title}/>
-                                        {errors.title && <P errors={errors.title} />}
+                                     <InputGroup className="my-1" >
+                                        <InputGroupText>
+                                            Título
+                                        </InputGroupText>
+                                        <input name="title" onChange={this.handleChange} type="text" className="form-control " placeholder="Title" value={this.state.title}/>                                    
+                                     </InputGroup>
+                                      {errors.title && <P errors={errors.title} />}
                                     </div>
                 
                                     <div className="row py-2">
-                                        <textarea name="description" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Description" value={this.state.description}/>
-                                        {errors.description && <P errors={errors.description} />}
+                                    <InputGroup className="my-1" >
+                                        <InputGroupText>
+                                            Descripción
+                                        </InputGroupText>
+                                        <textarea name="description" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Description" value={this.state.description}/>                                      
+                                    </InputGroup>  
+                                    {errors.description && <P errors={errors.description} />}
                                     </div>                            
                 
                                     <div className="row py-2">
@@ -858,8 +872,8 @@ class AdminTalleres extends Component {
                                     <br/>
                                     
                                     
-                                    <Button size='sm' id="btnInsertar">{this.state.textButton}</Button>{' '}
-                                    <Button size='sm' id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
+                                    <Button size='sm' id="btnInsertar"><FontAwesomeIcon icon={faSave}/>  {this.state.textButton}</Button>{' '}
+                                    <Button size='sm' id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true"><FontAwesomeIcon icon={faBan}/> CANCELAR</Button>
                                 </form>
                             </ModalBody>               
                         </Modal>

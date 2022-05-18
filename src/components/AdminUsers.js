@@ -1,6 +1,6 @@
 import React, {Component}from'react';
 import {render}from'react-dom';
-import {Table, Button, Container, CustomInput, Modal, ModalHeader, ModalBody, ModalFooter, formGroup} from 'reactstrap';
+import {Table, Button, Container, CustomInput,InputGroup,InputGroupText, Modal, ModalHeader, ModalBody, ModalFooter, formGroup} from 'reactstrap';
 import Swal from 'sweetalert';
 import axios from 'axios'
 import P from '../components/P';
@@ -8,7 +8,7 @@ import Styles from '../index.css'
 import md5 from 'md5';
 import DataTable from "@material-table/core";
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import { faFileAlt, faEdit, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faSkull, faClock, faRedo, faFileExcel, faUser, faUnlockAlt }from '@fortawesome/free-solid-svg-icons'
+import { faFileAlt, faEdit, faTrash, faFile, faSave, faSyncAlt, faCheckCircle, faBan,faSkull, faClock, faRedo, faFileExcel, faUser, faUnlockAlt }from '@fortawesome/free-solid-svg-icons'
 //import DataTable from 'material-table';
 import XLSX from 'xlsx'
 import Navigation from '../components/Navigation';
@@ -80,7 +80,9 @@ class AdminUsers extends Component {
             cedula: '',
             user: '',
             pass: '',
-            rol: '',
+            correo: '',
+            telefono: '',
+            rol: 'USUARIO',
             _id: '',
             users: [],
             textButton: 'REGISTRAR',
@@ -109,7 +111,7 @@ class AdminUsers extends Component {
     }
     getUsers() {
         axios.get(`${REACT_APP_HOST}/api/users`).then((response) => {
-            this.setState({users: response.data})
+            this.setState({users: response.data});
 //            console.log(response.data);
         })
     }
@@ -128,6 +130,8 @@ class AdminUsers extends Component {
             datos.append('cedula', this.state.cedula);
             datos.append('user', this.state.user);
             datos.append('pass', this.state.pass);
+            datos.append('correo', this.state.correo);
+            datos.append('telefono', this.state.telefono);
             datos.append('rol', this.state.rol);
 //            datos.append('image', this.state.image.name);
 
@@ -163,7 +167,7 @@ class AdminUsers extends Component {
                         button: false
                     });
                     this.getUsers();
-                    this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', _id: '', textButton: 'REGISTRAR', header: 'Insertar Usuario', modalOpen: false, aux: '', estado_update: false, image: '...', errors: {}});
+                    this.setState({nombre: '', apellido: '', cedula: '',correo:'',telefono:'', user: '', pass: '', rol: 'USUARIO', _id: '', textButton: 'REGISTRAR', header: 'Insertar Usuario', modalOpen: false, aux: '', estado_update: false, image: '...', errors: {}});
                 })
             } else {
 
@@ -178,7 +182,7 @@ class AdminUsers extends Component {
                     });
                     this.getUsers();
 
-                    this.setState({nombre: '', apellido: '', cedula: '', rol: '', user: '', pass: '', aux: '', image: '...'});
+                    this.setState({nombre: '', apellido: '', cedula: '',correo:'',telefono:'', rol: 'USUARIO', user: '', pass: '', aux: '', image: '...'});
                 });
             }
 
@@ -195,6 +199,8 @@ class AdminUsers extends Component {
                 cedula: response.data.cedula,
                 user: response.data.user,
                 pass: response.data.pass,
+                telefono: response.data.telefono,
+                correo: response.data.correo,
                 rol: response.data.rol,
                 image: response.data.image,
                 img_temp: response.data.image,
@@ -233,7 +239,7 @@ class AdminUsers extends Component {
         }).then((value) => {
             if (value) {
                 axios.delete(`${REACT_APP_HOST}/api/users/` + id).then(async(response) => {
-                    console.log(response.data);
+//                    console.log(response.data);
                     if (this.state.img_temp !== '...') {
                         let eliminar = await this.deleteImage();
                     }
@@ -253,20 +259,20 @@ class AdminUsers extends Component {
         this.setState({modalOpen: true});
     }
     hideModal() {
-        this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '', rol: '', modalOpen: false,estado_update: false, textButton: 'REGISTRAR', header: 'Insertar Usuario', image: '...', errors: {}})
+        this.setState({nombre: '', apellido: '', cedula: '', user: '', pass: '',correo:'',telefono:'', rol: 'USUARIO', modalOpen: false,estado_update: false, textButton: 'REGISTRAR', header: 'Insertar Usuario', image: '...', errors: {}})
     }
 
     showModalPass() {
         this.setState({modalOpenPass: true});
     }
     hideModalPass() {
-        this.setState({modalOpenPass: false});
+        this.setState({modalOpenPass: false,newpass:'',newpassconfirm:''});
     }
 
     handleChange(e) {
         const{name, value} = e.target;
         this.setState({[name]: value});
-        console.log(e.target.value);
+//        console.log(e.target.value);
     }
 
     uploadImage = async() => {
@@ -298,7 +304,7 @@ class AdminUsers extends Component {
     handleImageUpload = (e) => {
 
         this.setState({image: e.target.files[0], aux: e.target.files[0]});
-        console.log(e.target.files[0]);
+//        console.log(e.target.files[0]);
     }
 
     downloadReporte = (e) => {
@@ -323,9 +329,9 @@ class AdminUsers extends Component {
 
     resetearPassword = (e) => {
         e.preventDefault();
-        const datos = {newpass: this.state.newpass}
+        const datos = {newpass: this.state.newpass, id_user:this.state._id}
         if (this.state.newpass === this.state.newpassconfirm) {
-            axios.post(`${REACT_APP_HOST}/api/users/` + this.state._id + '/0', datos).then((response) => {
+            axios.post(`${REACT_APP_HOST}/api/users/resetpassword`, datos).then((response) => {
                 if (response.data) {
                     Swal({
                         title: '!OK',
@@ -355,16 +361,16 @@ class AdminUsers extends Component {
                 
                         <br/>
                         <Button color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faUser}/> Nuevo Usuario</Button>
-                        <br/>
-                
-                        <br/>
+                       
                         {this.state.users.length > 0 ?
                                     <DataTable
                             
                                         columns={[
                                                             {title: 'NOMBRE', field: 'nombre'},
                                                             {title: 'APELLIDO', field: 'apellido'},
-                                                            {title: 'CÉDULA', field: 'cedula', type: 'numeric'},
+                                                            {title: 'CÉDULA', field: 'cedula'},
+                                                            {title: 'CORREO', field: 'correo'},
+                                                            {title: 'TELÉFONO', field: 'telefono'},
                                                             {title: 'USUARIO', field: 'user'},
                                                             {title: 'ROL', field: 'rol'},
                                                             {title: 'IMAGEN', field: 'image'},
@@ -429,47 +435,99 @@ class AdminUsers extends Component {
                                         : <h1>No hay Usuarios registrados</h1>}
                             <Modal isOpen={this.state.modalOpen}>
                                 <ModalHeader>
-                                    <div><h3>{this.state.header}</h3></div>
+                                    <div><h3><FontAwesomeIcon icon={faUser}/> {this.state.header}</h3></div>
                                 </ModalHeader>
                 
                                 <ModalBody>
                                     <form onSubmit={this.addUser} className="container">
                                         <div className="row">
-                                            <input name="nombre" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Nombres" value={this.state.nombre}/>
-                                            {errors.nombre && <P errors={errors.nombre} />}
+                                         <InputGroup className="my-1" >
+                                            <InputGroupText>
+                                                Nombres
+                                            </InputGroupText>
+                                                <input name="nombre" onChange={this.handleChange} type="text" className="form-control" placeholder="Cristian" value={this.state.nombre}/>
+                                        </InputGroup>    
+                                        {errors.nombre && <P errors={errors.nombre} />}
                                         </div>
+                                        
                                         <div className="row my-2">
-                                            <input name="apellido" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Apellidos" value={this.state.apellido}/>
-                                            {errors.apellido && <P errors={errors.apellido} />}
-                                        </div>                            
+                                         <InputGroup className="my-1" >
+                                            <InputGroupText>
+                                                Apellidos
+                                            </InputGroupText>
+                                            <input name="apellido" onChange={this.handleChange} type="text" className="form-control" placeholder="Paz" value={this.state.apellido}/>
+                                        </InputGroup>    
+                                        {errors.apellido && <P errors={errors.apellido} />}
+                                        </div>  
+                                        
                                         <div className="row">
-                                            <input name="cedula" onChange={this.handleChange} type="number" className="form-control form-control-sm" placeholder="Cedula" value={this.state.cedula}/>
+                                         <InputGroup className="my-1" >
+                                            <InputGroupText>
+                                                Cédula
+                                            </InputGroupText>
+                                            <input name="cedula" onChange={this.handleChange} type="number" className="form-control " placeholder="1900xxxxxx" value={this.state.cedula}/>
+                                        </InputGroup>   
                                             {errors.cedula && <P errors={errors.cedula} />}
                                         </div> 
+                                        
                                         <div className="row my-2">
-                                            <input name="user" onChange={this.handleChange} type="text" className="form-control form-control-sm" placeholder="Nombre de usuario" value={this.state.user}/>
-                                            {errors.user && <P errors={errors.user} />}
+                                         <InputGroup className="my-1" >
+                                            <InputGroupText>
+                                                Usuario
+                                            </InputGroupText>
+                                            <input name="user" onChange={this.handleChange} type="text" className="form-control" placeholder="cris" value={this.state.user}/>
+                                        </InputGroup>    
+                                        {errors.user && <P errors={errors.user} />}
                                         </div>
+                                        
                                         {this.state.estado_update !== true ?
                                     <div className="row">
-                                        <input name="pass" onChange={this.handleChange} type="password" className="form-control form-control-sm" placeholder="Password" value={this.state.pass}/>
+                                    <InputGroup className="my-1" >
+                                            <InputGroupText>
+                                                Contraseña
+                                            </InputGroupText>
+                                        <input name="pass" onChange={this.handleChange} type="password" className="form-control " placeholder="*****" value={this.state.pass}/>
+                                    </InputGroup>    
                                         {errors.pass && <P errors={errors.pass} />}
-                                    </div> : ''}
-                                        <div className="row">
-                                            <select className="form-control form-control-sm my-2" name="rol" onChange={this.handleChange} value={this.state.rol}>
+                                    
+                                     </div> : ''}
+                                    <div className="row my-2">
+                                    <InputGroup className="my-1" >
+                                            <InputGroupText>
+                                                Correo
+                                            </InputGroupText>
+                                        <input name="correo" onChange={this.handleChange} type="email" className="form-control " placeholder="pcris.994@gmail.com" value={this.state.correo}/>
+                                    </InputGroup>
+                                    </div>
+                                    
+                                    <div className="row my-2">
+                                    <InputGroup className="my-1" >
+                                            <InputGroupText>
+                                                Teléfono
+                                            </InputGroupText>
+                                        <input name="telefono" onChange={this.handleChange} type="text" className="form-control " placeholder="0992094788" value={this.state.telefono}/>
+                                    </InputGroup>    
+                                    </div>
+                                        <div className="row my-2">
+                                        <InputGroup className="my-1" >
+                                            <InputGroupText>
+                                                Rol
+                                            </InputGroupText>
+                                            <select className="form-control" name="rol" onChange={this.handleChange} value={this.state.rol}>
                                                 <option>Selecione un Rol</option>
                                                 <option value="USUARIO">USUARIO</option>
                                                 <option value="ADMINISTRADOR">ADMINISTRADOR</option>
                                             </select>
+                                        </InputGroup>    
                                             {errors.rol && <P errors={errors.rol} />}
                                         </div>                            
-                                        <div className="row">
+                                        <div className="row my-2">
                                             <CustomInput className="form-control-sm" name="image" type="file" onChange={this.handleImageUpload} id="image" label='Seleccione una Foto' accept="image/png, .jpeg, .jpg"/>
                                         </div>
                                         <br/>
                 
-                                        <Button id="btnInsertar">{this.state.textButton}</Button>{' '}
-                                        <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
+                                        <Button id="btnInsertar"><FontAwesomeIcon icon={faSave}/> {this.state.textButton}</Button>{' '}
+                                        <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true"><FontAwesomeIcon icon={faBan}/> CANCELAR</Button>
                                     </form>
                                 </ModalBody>               
                             </Modal>
@@ -492,7 +550,7 @@ class AdminUsers extends Component {
                                         <br/>
                 
                                         <Button id="btnReset"> <FontAwesomeIcon icon={faUnlockAlt}/> RESETEAR</Button>{' '}
-                                        <Button id="btnCancelar2" onClick={this.hideModalPass} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
+                                        <Button id="btnCancelar2" onClick={this.hideModalPass} className="btn btn-danger" data-dismiss="modal" aria-hidden="true"><FontAwesomeIcon icon={faBan}/> CANCELAR</Button>
                                     </form>
                                 </ModalBody>               
                             </Modal>

@@ -57,22 +57,35 @@ export default  class ResetIntentos extends Component {
     }
 
     get_taller_usuario(ci) {
-        axios.get(`${REACT_APP_HOST}/api/user_taller/` + 'sn/' + ci).then((response) => {
-            if (response) {
-                this.setState({lista_taller_user: response.data})
-                this.get_user(ci);
-            } else {
-                Swal({
-                    title: 'No se encontraron resultados con este CI',
-                    icon: 'warning',
-                    timer: 2000,
-                    button: false
-                });
-            }
-        })
+        if (ci != '') {
+            axios.get(`${REACT_APP_HOST}/api/user_taller/get_taller_ci/` + ci).then((response) => {
+                if (response.data != '') {
+                    this.setState({lista_taller_user: response.data})
+                    this.get_user(ci);
+                } else {
+                    Swal({
+                        title: 'Atención',
+                        text: 'No se encontraron resultados con este CI:' + ci + ' ',
+                        icon: 'warning',
+                        timer: 3000,
+                        button: false
+                    });
+                }
+            })
+        } else {
+            Swal({
+                title: 'Atención',
+                text: 'El campo cedula esta vacio',
+                icon: 'warning',
+                timer: 2000,
+                button: false
+            });
+        }
+
     }
     get_user(ci) {
-        axios.get(`${REACT_APP_HOST}/api/users/` + ci + '/id/sn').then((response) => {
+        const datos = {ci: ci}
+        axios.post(`${REACT_APP_HOST}/api/users/user_ci`, datos).then((response) => {
             if (response) {
                 this.setState({usuario: response.data.nombre + response.data.apellido})
             }
@@ -104,7 +117,7 @@ export default  class ResetIntentos extends Component {
     }
 
     handleChange(e) {
-        console.log(e.target.value);
+//        console.log(e.target.value);
         if (e.target.type === 'checkbox') {
             var value = e.target.checked;
             var name = e.target.name;
@@ -138,8 +151,8 @@ export default  class ResetIntentos extends Component {
                 
                                 columns={[
                                     {title: 'Taller', field: 'taller_user.title'},
-                                    {title: 'Intentos Permitidos', field: 'taller_user.intentos',render:(rowData)=><Grid><Avatar>{rowData.taller_user.intentos}</Avatar></Grid>},
-                                    {title: 'Total de Intentos', field: 'intentos',render:(rowData)=><Grid><Avatar>{rowData.intentos}</Avatar></Grid>}
+                                    {title: 'Intentos Permitidos', field: 'taller_user.intentos', render: (rowData) => <Grid><Avatar>{rowData.taller_user.intentos}</Avatar></Grid>},
+                                    {title: 'Total de Intentos', field: 'intentos', render: (rowData) => <Grid><Avatar>{rowData.intentos}</Avatar></Grid>}
                                 ]}
                 
                                 data={this.state.lista_taller_user}
@@ -148,11 +161,11 @@ export default  class ResetIntentos extends Component {
 //                                   
                                     {
                                         icon: () => <a className="btn btn-warning btn-sm" size="sm"><FontAwesomeIcon icon={faRetweet}/></a>,
-                                            tooltip: 'Habilitar Taller',
-                                            onClick: (event, rowData) => {
-                                                this.resetearIntentos(rowData._id)
-                                            }
-                                        },
+                                        tooltip: 'Resetear Intentos',
+                                        onClick: (event, rowData) => {
+                                            this.resetearIntentos(rowData._id)
+                                        }
+                                    },
                                 ]}
                                 options={{
                                         actionsColumnIndex: -1,

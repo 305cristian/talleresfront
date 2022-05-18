@@ -5,7 +5,7 @@ import{useParams, Link} from 'react-router-dom';
 import axios from 'axios';
 
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
-import {faCheckCircle, faStepBackward}from '@fortawesome/free-solid-svg-icons'
+import {faCheckCircle, faStepBackward,faFilm}from '@fortawesome/free-solid-svg-icons'
 
 import Navigation from '../components/Navigation';
 import Breadcrumb_nav from '../components/Breadcrumb_nav';
@@ -63,8 +63,13 @@ function Culminado() {
                         <h5>Curso Completado el {fecha} <FontAwesomeIcon icon={faCheckCircle} /></h5>
                         <Card>
                         <CardHeader><div className="pl-2"><CardTitle className="font-weight-bold" tag="h5">Nombre del curso: {taller.title} <FontAwesomeIcon icon={faCheckCircle} /></CardTitle></div></CardHeader>
-                        <div className="pl-2 pb-2 text-left">
-                            <Link to={`/home`}><Button color="success"><FontAwesomeIcon icon={faStepBackward} />Home</Button></Link>
+                        <div className="pl-2 pb-2 row col-md-12">
+                            <div className=" py-2  col-md-6 text-left">
+                                <Link to={`/home`}><Button color="success"><FontAwesomeIcon icon={faStepBackward} />Home</Button></Link>
+                            </div>
+                            <div className=" py-2  col-md-6 text-right">
+                                <Link to={`/presentacion/${taller._id}/1`}><Button color="primary"><FontAwesomeIcon icon={faFilm} /> Ver Presentación</Button></Link>
+                            </div>
                         </div>
                         </Card>
             

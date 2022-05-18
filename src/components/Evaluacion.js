@@ -73,6 +73,12 @@ class Evaluacion extends Component {
         interval = setInterval(this.cargarSegundos, 1000);
 
     }
+      nobackbutton(){      	
+           window.location.hash="no-back-button";	
+           window.location.hash="Again-No-back-button" //chrome 	
+           window.onhashchange=function(){window.location.hash="no-back-button";}
+        	
+        }
 
     getPreguntasRespuestas() {
         const {match} = this.props;
@@ -165,6 +171,7 @@ class Evaluacion extends Component {
     }
 
     validarRespuestas() {
+         this.nobackbutton();
         cont_incorrectas = 0;
         cont_correctas = 0;
 

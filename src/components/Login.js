@@ -63,8 +63,14 @@ class login extends Component {
         const result = validation(sinErrors);
         this.setState({errors: result});
         if (!Object.keys(result).length) {
+            
+            const datos={
+                user:this.state.user,
+                pass:this.state.pass
+            };
 
-            axios.get(`${REACT_APP_HOST}/api/users/` + this.state.user + '/' + this.state.pass).then((response) => {
+//            axios.get(`${REACT_APP_HOST}/api/users/` + this.state.user + '/' + this.state.pass).then((response) => {
+            axios.post(`${REACT_APP_HOST}/api/users/login`,datos).then((response) => {
                 return response.data
             }).then((response) => {
                 if (response) {

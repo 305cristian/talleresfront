@@ -100,10 +100,11 @@ export default class Navigation extends Component {
                                     <DropdownToggle color='dark' caret >
                                         <span><FontAwesomeIcon icon={faCogs} /> Settings</span>
                                     </DropdownToggle>
-                                    <DropdownMenu>
+                                    <DropdownMenu>                                   
                                        <DropdownItem><Link className='text-dark text-decoration-none' to="/resetIntentos"><FontAwesomeIcon icon={faHistory}/> Reset Intentos</Link></DropdownItem>                                        
+                                       <DropdownItem><Link className='text-dark text-decoration-none' to="/resetTalleres"><FontAwesomeIcon icon={faHistory}/> Resetear Talleres Por Usuario</Link></DropdownItem>                                        
                                     </DropdownMenu>
-                                    
+
                                 </Dropdown>
                                  :''}
                                 

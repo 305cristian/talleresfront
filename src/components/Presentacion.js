@@ -30,6 +30,7 @@ const styles = {
 function Presentacion() {
 
     const {id} = useParams();
+    const {estado} = useParams();
     const[taller, getTaller] = useState([]);
     const[value, setstatusBoton] = useState(false);
 
@@ -111,10 +112,11 @@ function Presentacion() {
                                 </Col>
                     
                                 <div className=" col-md-12 d-flex text-white p-3">
-                                   
+                                   {estado==='0'?
                                     <div className=" col-md-12 text-right">
                                         <Link to={`/evaluacion/${id}`}target="_blank"><Button size="lg" disabled={!value} color="success"><FontAwesomeIcon icon={faPenAlt}/> Evaluación</Button></Link>                                                              
                                     </div>
+                                     :''}
                                 </div>
                     
                             </Row>
@@ -125,9 +127,11 @@ function Presentacion() {
                                     <Card>
                                     <CardHeader><div className="pl-2"><CardTitle className="font-weight-bold" tag="h5">{taller.title}</CardTitle></div></CardHeader>
                                     <CardBody><div className="pl-2"><CardText>{taller.description}</CardText></div></CardBody>
+                                    {estado==='0'?
                                     <div className="pl-2 pb-2 text-center">
                                         <Link to={`/evaluacion/${id}`}target="_blank"><Button disabled={value} color="success"><FontAwesomeIcon icon={faPenAlt}/> Evaluacion</Button></Link>
                                     </div>
+                                    :''}
                                     </Card>
                     
                                 </div><br/>

@@ -199,7 +199,7 @@ class ListTalleres extends Component {
                                                                                                             <div className="face face2">
                                                                                                                 <div className="content">
                                                                                                                     <CardText>{taller.description}</CardText>
-                                                                                                                    <Link to={`/presentacion/${taller._id}`} style={{color: "black", textDecoration: "none black"}}><span><FontAwesomeIcon icon={faFilm}/> Ver Presentación</span></Link>
+                                                                                                                    <Link to={`/presentacion/${taller._id}/0`} style={{color: "black", textDecoration: "none black"}}><span><FontAwesomeIcon icon={faFilm}/> Ver Presentación</span></Link>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                         </div>

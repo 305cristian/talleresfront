@@ -1,6 +1,6 @@
 import React, {Component}from'react';
 import {render}from'react-dom';
-import {Table, Button, Container, CustomInput, Modal, ModalHeader, ModalBody, ModalFooter, formGroup} from 'reactstrap';
+import {Table, Button, Container,InputGroup,InputGroupText, CustomInput, Modal, ModalHeader, ModalBody, ModalFooter, formGroup} from 'reactstrap';
 import Swal from 'sweetalert';
 import axios from 'axios'
 import P from '../components/P';
@@ -11,7 +11,7 @@ import Breadcrumb_nav from '../components/Breadcrumb_nav';
 import Cookies from 'universal-cookie';
 import firebase from '../../src/setting/server_firebase';
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome';
-import {faCheckCircle, faExclamationCircle, faExclamationTriangle, faEdit, faTrash, faFile,faFileExcel}from '@fortawesome/free-solid-svg-icons';
+import {faCheckCircle, faExclamationCircle,faSave,faBan,faBook, faFileAlt,faExclamationTriangle, faEdit, faTrash, faFile,faFileExcel}from '@fortawesome/free-solid-svg-icons';
 import DataTable from "@material-table/core";
 import XLSX from 'xlsx'
 
@@ -60,6 +60,7 @@ class AdminAreas extends Component {
         this.state = {
             title: '',
             description: '',
+            estado: '1',
             _id: '',
             areas: [],
             textButton: 'REGISTRAR',
@@ -84,9 +85,9 @@ class AdminAreas extends Component {
         this.getAreas();//Para que inicie la pantalla de tareas
     }
     getAreas() {
-        axios.get(`${REACT_APP_HOST}/api/areas`).then((response) => {
+        axios.post(`${REACT_APP_HOST}/api/areas/get_areas`).then((response) => {
             this.setState({areas: response.data})
-            console.log(response.data);
+//            console.log(response.data);
         })
     }
 
@@ -101,16 +102,17 @@ class AdminAreas extends Component {
             let datos = new FormData();
             datos.append('title', this.state.title);
             datos.append('description', this.state.description);
+            datos.append('estado', this.state.estado);
 //            datos.append('image', this.state.image.name);
             
             if (this.state._id && this.state.aux==='') {
-                console.log('modifico');
+//                console.log('modifico');
                 datos.append('image', this.state.image);
             } else if(this.state._id && this.state.aux.name) {
-                 console.log('modifico imagen');
+//                 console.log('modifico imagen');
                 datos.append('image', this.state.image.name);
             }else{
-                 console.log('guardo');
+//                 console.log('guardo');
                 datos.append('image', this.state.image.name); 
             }
             
@@ -130,7 +132,7 @@ class AdminAreas extends Component {
                         button: false
                     });
                     this.getAreas();
-                    this.setState({title: '', description: '', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: null,aux:'', errors: {}});
+                    this.setState({title: '', description: '',estado:'1', _id: '', textButton: 'REGISTRAR', modalOpen: false, image: null,aux:'', errors: {}});
                 })
             } else {
                 axios.post(`${REACT_APP_HOST}/api/areas`, datos).then(async(response) => {
@@ -142,7 +144,7 @@ class AdminAreas extends Component {
                         button: false
                     });
                     this.getAreas();
-                    this.setState({title: '', description: '',aux:'', image: null})
+                    this.setState({title: '', description: '',estado:'1',aux:'', image: null})
                 })
             }
         }
@@ -154,13 +156,14 @@ class AdminAreas extends Component {
             this.setState({
                 title: response.data.title,
                 description: response.data.description,
+                estado: response.data.estado,
                 image: response.data.image,
                 img_temp: response.data.image,
                 _id: response.data._id,
                 textButton: 'ACTUALIZAR',
                 header: 'Actualizar Area',
             })
-            console.log(this.state.image)
+//            console.log(this.state.image)
         })
     }
     
@@ -192,7 +195,7 @@ class AdminAreas extends Component {
             if (value) {
                 
                 axios.delete(`${REACT_APP_HOST}/api/areas/` + id).then(async(response) => {
-                    console.log(response.data);
+//                    console.log(response.data);
                      let eliminar = await this.deleteImage();
                     Swal({
                         title: 'Area eliminada',
@@ -218,13 +221,13 @@ class AdminAreas extends Component {
     handleChange(e) {
         const{name, value} = e.target;
         this.setState({[name]: value});
-        console.log(e.target.value);
+//        console.log(e.target.value);
     }
     
      uploadImage = async() => {
         var storageRef = storage.ref();       
         var spaceRef = storageRef.child(`images/imgareas/${this.state.image.name}`);
-         console.log(spaceRef);
+//         console.log(spaceRef);
         return await spaceRef.put(this.state.image);
 
     }
@@ -251,7 +254,7 @@ class AdminAreas extends Component {
 
     handleImageUpload = (e) => {
         this.setState({image: e.target.files[0],aux: e.target.files[0]});
-        console.log(e.target.files[0]);
+//        console.log(e.target.files[0]);
     }
      downloadReporte=(e)=>{
       const newData=this.state.areas.map(row=>{
@@ -282,18 +285,20 @@ class AdminAreas extends Component {
                     <Navigation />
                     <div className="containerList">
                         <br/>
-                        <Button color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFile}/> Nueva Area</Button>
-                        <br/>
-                         
-                        <br/>
+                        <Button color="primary" onClick={this.showModal}><FontAwesomeIcon icon={faFileAlt}/> Nueva Area</Button>
+              
                         {this.state.areas.length > 0 ?
                                 <DataTable
                            
                                 columns={[
                                    {title:'AREA', field:'title'},
                                    {title:'DETALLE', field:'description'},
+                                   {title: 'Estado', field: 'estado',
+                                        render: (rowData) => rowData.estado === '0' ? <span size="sm" className='badge text-white bg-danger'>Inactivo <FontAwesomeIcon icon={faExclamationCircle} /></span>
+                                                    : <span size="sm" className='badge bg-success text-white'>Activo <FontAwesomeIcon icon={faCheckCircle}/></span>
+
+                                    },
                                    {title:'IMG-DIR', field:'image'},
-                                   
                                 ]}
                                 data={this.state.areas}
                                 title='Lista de Areas'
@@ -339,19 +344,28 @@ class AdminAreas extends Component {
                                     : <h5 className="text-warning">! Atencion, No se encontraron areas registradas <FontAwesomeIcon icon={faExclamationTriangle}/></h5>}
                         <Modal isOpen={this.state.modalOpen}>
                             <ModalHeader>
-                                <div><h3>{this.state.header}</h3></div>
+                                <div><h3><FontAwesomeIcon icon={faBook}/> {this.state.header}</h3></div>
                             </ModalHeader>
                 
                             <ModalBody>
                                 <form onSubmit={this.addArea} className="container">
                                     <div className="row">
+                                    <InputGroup className="my-1" >
+                                        <InputGroupText>
+                                            Titulo
+                                        </InputGroupText>
                                         <input name="title" onChange={this.handleChange} type="text" className="form-control" placeholder="Title" value={this.state.title}/>
-                                        {errors.title && <P errors={errors.title} />}
+                                    </InputGroup> 
+                                      {errors.title && <P errors={errors.title} />}
                                     </div>
                                     <br/>
                                     <div className="row">
+                                     <InputGroup className="my-1" >
+                                        <InputGroupText>
+                                            Descripción
+                                        </InputGroupText>
                                         <textarea name="description" onChange={this.handleChange} type="text" className="form-control" placeholder="Description" value={this.state.description}/>
-                
+                                    </InputGroup>
                                     </div>                            
                                     <br/>
                                     <div className="row">
@@ -359,9 +373,22 @@ class AdminAreas extends Component {
                                         {errors.image && <P errors={errors.image} />}
                                     </div>
                                     <br/>
+                                    <div className="row">
+                                     <InputGroup className="my-1" >
+                                        <InputGroupText>
+                                            Estado
+                                        </InputGroupText>
+                                        <select name="estado" className='form-control' onChange={this.handleChange} value={this.state.estado}>
+                                            <option value='1'>ACTIVO</option>
+                                            <option value='0'>INACTIVO</option>
+                                        </select>
+                                    </InputGroup>
+                                    </div>
+                                    
+                                    <br/>
                 
-                                    <Button id="btnInsertar">{this.state.textButton}</Button>{' '}
-                                    <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true">CANCELAR</Button>
+                                    <Button id="btnInsertar"><FontAwesomeIcon icon={faSave}/> {this.state.textButton}</Button>{' '}
+                                    <Button id="btnCancelar" onClick={this.hideModal} className="btn btn-danger" data-dismiss="modal" aria-hidden="true"><FontAwesomeIcon icon={faBan}/> CANCELAR</Button>
                                 </form>
                             </ModalBody>               
                         </Modal>
