@@ -114,7 +114,7 @@ function Presentacion() {
                                 <div className=" col-md-12 d-flex text-white p-3">
                                    {estado==='0'?
                                     <div className=" col-md-12 text-right">
-                                        <Link to={`/evaluacion/${id}`}target="_blank"><Button size="lg" disabled={!value} color="success"><FontAwesomeIcon icon={faPenAlt}/> Evaluación</Button></Link>                                                              
+                                        <Link to={`/evaluacion/${id}`}><Button size="lg" disabled={!value} color="success"><FontAwesomeIcon icon={faPenAlt}/> Evaluación</Button></Link>                                                              
                                     </div>
                                      :''}
                                 </div>
