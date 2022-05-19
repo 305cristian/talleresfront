@@ -52,7 +52,7 @@ class login extends Component {
     handleKeyPress(e) {
 
         if (e.key === 'Enter') {
-            console.log('do validate');
+//            console.log('do validate');
             this.login_session();
         }
     }
@@ -63,31 +63,42 @@ class login extends Component {
         const result = validation(sinErrors);
         this.setState({errors: result});
         if (!Object.keys(result).length) {
-            
-            const datos={
-                user:this.state.user,
-                pass:this.state.pass
-            };
 
-//            axios.get(`${REACT_APP_HOST}/api/users/` + this.state.user + '/' + this.state.pass).then((response) => {
-            axios.post(`${REACT_APP_HOST}/api/users/login`,datos).then((response) => {
-                return response.data
-            }).then((response) => {
-                if (response) {
-                    cookies.set('id', response._id, {path: '/'});
-                    cookies.set('nombre', response.nombre, {path: '/'});
-                    cookies.set('apellido', response.apellido, {path: '/'});
-                    cookies.set('user', response.user, {path: '/'});
-                    cookies.set('rol', response.rol, {path: '/'});
-                    cookies.set('cedula', response.cedula, {path: '/'});
-                    cookies.set('image', response.image, {path: '/'});
-                    window.location.href = '/home';
+            const datos = {
+                user: this.state.user,
+                pass: this.state.pass
+            };
+            axios.post(`${REACT_APP_HOST}/api/users/login`, datos).then((response) => {
+
+                if (response.data.auth) {
+                    this.validar_token(response.data.token);
                 } else {
-                    const error_logeo = document.getElementById('idError')
-                    error_logeo.innerHTML = 'Usuario o contraseña incorrectos'
+                    const error_logeo = document.getElementById('idError');
+                    error_logeo.innerHTML = 'Usuario o contraseña incorrectos';
                 }
-            })
+            });
+
         }
+    }
+
+    validar_token(token) {
+        axios.get(`${REACT_APP_HOST}/api/users/validar_token/0`, {headers: {'x-token': token}}).then((response) => {
+            return response.data.data_user;
+        }).then((response) => {
+            if (response) {         
+                cookies.set('id', response._id, {path: '/'});
+                cookies.set('nombre', response.nombre, {path: '/'});
+                cookies.set('apellido', response.apellido, {path: '/'});
+                cookies.set('user', response.user, {path: '/'});
+                cookies.set('rol', response.rol, {path: '/'});
+                cookies.set('cedula', response.cedula, {path: '/'});
+                cookies.set('image', response.image, {path: '/'});
+                window.location.href = '/home';
+            } else {
+                const error_logeo = document.getElementById('idError')
+                error_logeo.innerHTML = 'Usuario o contraseña incorrectos'
+            }
+        });
     }
 
     render() {
@@ -133,20 +144,20 @@ class login extends Component {
                                             <div className="mb-3 aler alert-danger">
                                                 <span className="display text-danger" id="idError"></span>
                                             </div>
-                                                                     
+                
                                         </form>
-                                     
+                
                                     </div> 
-                                      
+                
                                 </div>
                             </div>
-                             
+                
                         </div>
-                            <div>
-                                <h4 className="text-white">Sistema de Capacitaciones online</h4>
-                            </div>
+                        <div>
+                            <h4 className="text-white">Sistema de Capacitaciones online</h4>
+                        </div>
                     </div>
-                                
+                
                 </Container>
 
                 )

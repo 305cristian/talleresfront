@@ -152,8 +152,8 @@ export default class Navigation extends Component {
                         </div>                          
                 
                         <div>
-                            <div class="modal-body border">
-                                <div class="container border pt-2">
+                            <div className="modal-body border">
+                                <div className="container border pt-2">
                                     <p>
                                         <label>Telefono: 0992094788</label><br/>
                                         <label>Correo: pcris.994@gmail.com</label>
