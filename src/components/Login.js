@@ -108,7 +108,7 @@ class login extends Component {
                     <div className="image_login modal-dialog sombra text-center border my-5">
                         <div className="modal-dialog text-center ">
                             <div className="col-sm-8 main-section">
-                                <p className="display-4 text-white" >LOGIN</p>
+                                <p className="display-4 text-white" >LOGINs</p>
                                 <hr className="bg-info col-md-8"></hr>   
                             </div>       
                         </div>
